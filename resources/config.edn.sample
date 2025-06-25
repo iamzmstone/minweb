@@ -1,0 +1,4 @@
+{:app-name "minweb"
+ :title "Min's Web Application"
+ :dtlv-opts "db/dtlv.db"
+ :page-size 20}

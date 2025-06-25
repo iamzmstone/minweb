@@ -20,26 +20,6 @@
 (def Utf8-bom "\uFEFF")
 
 (def env (load-config))
-(def Dump-dir (env :dump-dir))
-(def Prom-server (env :prom-server))
-(def Telnet-sh (str (env :script-dir) "telnet_exec.py"))
-(def Cmd-pinyin (str (env :script-dir) "pinyin"))
-(def Cmd-cut (str (env :script-dir) "ch_cut.py"))
-(def Cmd-cvtutf8 (str (env :script-dir) "cvtutf8.py"))
-(def Cmd-reload-nagios (str (env :script-dir) "reload-nagios.sh"))
-(def Snmp-dump (str Dump-dir "ifs.dump"))
-(def Netcfg-dir (str Dump-dir "netconfig"))
-(def Sw-file (str Dump-dir "switches.txt"))
-(def Olt-file (str Dump-dir "olts.txt"))
-(def Port-file (str Dump-dir "ports.txt"))
-(def Vlan-file (str Dump-dir "vlans.txt"))
-(def Nag-grp-file (str Dump-dir "nag_grps.txt"))
-(def Nagios-file (str Dump-dir "nagios_dump.txt"))
-(def Nag-ipfile (str Dump-dir "nagiosip.txt"))
-(def Sponu-file (str Dump-dir "sponu.txt"))
-(def Arp-file (str Dump-dir "arpall.txt"))
-(def Ponmac-file (str Dump-dir "pon_mac.txt"))
-(def Input-file (str Dump-dir "input.txt"))
 
 (defn windows
   []
@@ -48,12 +28,6 @@
 (defn rand-uuid
   []
   (java.util.UUID/randomUUID))
-
-(defn pinyin
-  [^String s]
-  (-> (sh Cmd-pinyin s)
-      :out
-      str/trim))
 
 (defn to-bj-time
   "opt can be {:format yyyy-MM-dd HH:mm:ss.SSSXXX}"
@@ -65,54 +39,9 @@
         formatter (DateTimeFormatter/ofPattern format)]
     (.format formatter beijing-time)))
 
-(defn reload-nagios
-  []
-  (let [ret (sh Cmd-reload-nagios)]
-    (if (:out ret)
-      (:out ret)
-      (:err ret))))
-
-(defn telnet-out
-  [opt]
-  (->> (cond
-         (:cmds opt) ["--cmd-file" (:cmds opt)]
-         (:script opt) ["--script" (:script opt)]
-         (:cmd opt) ["--cmd" (:cmd opt)])
-       (concat [Telnet-sh
-                "--ip" (:ip opt)
-                "--user" (:user opt)
-                "--pwd" (:pwd opt)
-                "--type" (if (:type opt) (name (:type opt)) "C300")])
-       (apply sh)
-       :out))
-
-(defn cvtutf8
-  [file]
-  (let [ret (sh Cmd-cvtutf8 "--file" file)]
-       (if (zero? (:exit ret))
-         (let [[_ enc] (re-find #"Detected encoding: (.+)" (:out ret))]
-           [true enc])
-           [false (:err ret)])))
-
 (defn cnt-space
   [s]
   (count (filter #(= \space %) s)))
-
-(defn ch-cut
-  [txt]
-  (if (empty? txt)
-    ""
-    (let [txt (str/replace txt #"^-" "")
-          ret (->> [Cmd-cut
-                    "--text" txt]
-                   (apply sh))]
-      (if (= 0 (:exit ret))
-        (str/trim (:out ret))
-        (throw (ex-info
-                (str "cmd is: " [Cmd-cut
-                                 "--text" txt]
-                     " error is: "(:err ret))
-                ret))))))
 
 (defn trunc-str
   [s len]
@@ -275,10 +204,6 @@
                  (map #(vector (keyword (first %))
                                (second %))))]
     (into {} kvs)))
-
-(defn dt-to-s
-  [dt]
-  (str/replace (str dt) "T" " "))
 
 (defn inst-to-s
   [inst]

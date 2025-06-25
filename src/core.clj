@@ -16,7 +16,7 @@
 
 (def cli-options-spec {:help {:alias :h}
                        :port {:coerce :int
-                              :default 6666
+                              :default 8888
                               :alias :p}})
 
 (log/merge-config!
@@ -47,7 +47,7 @@
             :join? false})))
 
 (defn -main
-  "Start the web server default on port 6666"
+  "Start the web server default on port 8888"
   [& args]
   (let [cli-options (cli/parse-opts args {:spec cli-options-spec})
         {:keys [port help]} cli-options]
@@ -59,7 +59,7 @@
           @(promise)))))
 
 ;;
-;; Repl functions. To startup and stop the system
+;; Repl functions. To startup and st   the system
 ;;
-(comment (start-server 6666))
+(comment (start-server 8888))
 (comment (@server))

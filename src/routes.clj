@@ -2,6 +2,8 @@
   (:require
    [ruuter.core :as ruuter]
    [static :as static]
+   [view.index :as index]
+   [view.core :as core]
    [view.login :as login]))
 
 (defn route
@@ -38,4 +40,9 @@
 (def routes
   #(ruuter/route
     [(http-get "/static/:filename" static/serve-static)
-     (http-get "/login" login/index)] %))
+     (http-get "/" index/page)
+     (http-get "/login" login/index)
+     (http-get "/logout" login/logout)
+     (http-post "/login" login/login)
+     (http-post "/change-page-size" core/change-page-size)
+     ] %))

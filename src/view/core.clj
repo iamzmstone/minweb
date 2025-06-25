@@ -3,6 +3,7 @@
    [taoensso.timbre :as log]
    [clojure.string :as str]
    [utils.session :refer [current-user]]
+   [utils.response :as r]
    [hiccup2.core :as h]
    [ring.middleware.anti-forgery :as af]))
 
@@ -49,6 +50,14 @@
      [:div
       [:h4.font-semibold tip]
       [:p content]]]))
+
+(defn change-page-size [req]
+  (let [referer (get-in req [:headers "referer"])
+        ps (-> (get-in req [:params "page-size"])
+               parse-long)
+        session (assoc (:session req) :page-size ps)]
+    (assoc (r/redirect referer)
+           :session session)))
 
 (defn svrt-cls
   [severity]
@@ -172,8 +181,7 @@
      [:head
       [:meta {:charset "utf-8"}]
       [:title title]
-      [:script {:src "/static/css/tailwind.css"}]
-      #_[:link {:href "/statc/css/tw_out.css" :rel "stylesheet"}]
+      [:link {:href "/statc/css/tw_out.css" :rel "stylesheet"}]
       [:body.bg-gray-50.min-h-screen.flex.flex-col.justify-center.p-4
        [:div.max-w-8xl.mx-auto.p-4.bg-white.rounded-lg.shadow-md
         [:div.p-4.border-b.border-gray-200.flex.justify-between.items-center

@@ -9,6 +9,7 @@
 
 
 (def Title (or (env :title) "网管2.0"))
+(def App-name (or (env :app-name) "Minweb"))
 (def Menu
   [["/admin" "后台管理"]
    ["/switch" "交换机"]
@@ -105,7 +106,7 @@
                       (filter #(authorized? user (first %))))))]
     [:nav.bg-gray-900.text-white
      [:div.container.mx-auto.flex.flex-wrap.items-center.justify-between.p-4
-      [:a.text-2xl.font-bold {:href "/"} Title]
+      [:a.text-2xl.font-bold {:href "/"} App-name]
       [:button.block.lg:hidden {:id "menu-toggle"}
        [:svg.w-6.h-6 {:fill "none" :stroke "currentColor"
                       :viewBox "0 0 24 24"}]]

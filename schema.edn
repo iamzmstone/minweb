@@ -1,0 +1,17 @@
+{:user/email
+ {:db/doc "User Email"
+  :db/valueType :db.type/string
+  :db/unique :db.unique/identity}
+ :user/name
+ {:db/doc "User name"
+  :db/valueType :db.type/string}
+ :user/password
+ {:db/doc "User password"
+  :db/valueType :db.type/string}
+ :user/role
+ {:db/doc "Role of user"
+  :db/valueType :db.type/keyword}
+ :user/privs
+ {:db/doc "Privileges of user"
+  :db/valueType :db.type/keyword
+  :db/cardinality :db.cardinality/many}}

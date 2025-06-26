@@ -20,7 +20,9 @@
    ["/logout" "登出"]])
 
 (defn paginator [req current-page pages base-url]
-  (let* [sizes [20 40 60]
+  (let* [sizes [20 40 60 80]
+         sel-cls "mx-1 border rounded w-16 text-center text-gray-700 focus:ring-blue-500 focus:border-blue-500"
+         a-cls "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
          ps (s/cur-page-size req)
          q (:query-params req)
          next (when (not= current-page pages)
@@ -36,7 +38,7 @@
       [:form {:method "post" :action "/change-page-size"}
        (c/csrf-token)
        [:span.text-sm.text-gray-700 "显示"]
-       [:select.ml-1.mr-1.border.rounded.w-16.text-center.text-gray-700.focus:ring-blue-500.focus:border-blue-500
+       [:select {:class sel-cls}
         {:id "sel-ps"
          :name "page-size"
          :onchange "this.form.submit()"}
@@ -45,7 +47,7 @@
           s])]]]
      [:nav.relative.z-0.inline-flex.shadow-sm.-space-x-px
       {:aria-label "Pagination"}
-      [:a.relative.inline-flex.items-center.px-2.py-2.rounded-l-md.border.border-gray-300.bg-white.text-sm.font-medium.text-gray-500.hover:bg-gray-50
+      [:a {:class a-cls}
        (if (nil? previous)
          {:class "hidden"}
          {:href previous})
@@ -57,7 +59,7 @@
                 :d "M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"}]]]
       [:span.text-blue-500.px-2.py-2.border.border-gray-300.font-semibold
        (format "%d/%d" current-page pages)]
-      [:a.relative.inline-flex.items-center.px-2.py-2.rounded-l-md.border.border-gray-300.bg-white.text-sm.font-medium.text-gray-500.hover:bg-gray-50
+      [:a {:class a-cls}
        (if (nil? next)
          {:class "hidden"}
          {:href next})
@@ -97,8 +99,36 @@
      [:label.form-label label]
      [:input.form-control {:type type :value value :name name :required required}]]))
 
+(defn search-form
+  []
+  (let [input-cls "bg-white rounded-l-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-500 transition text-black"
+        btn-cls "bg-green-500 hover:bg-green-600 text-white p-2 rounded-t-md transition"]
+    [:form
+     {:class "flex mt-4 lg:mt-0 lg:ml-4"
+      :_ "on submit
+            set q to (value of the #input-q)
+            if q.length is less than 2
+              alert('请输入至少2个字符') then halt
+            end"}
+     (c/csrf-token)
+     [:input
+      {:class input-cls :type "search" :name "q" :id "input-q" :required true}]
+     [:button
+      {:hx-post "/search"
+       :hx-target "body"
+       :hx-indicator "#search-spinner"
+       :class btn-cls
+       :type "submit"} "搜索"]
+     [:img.htmx-indicator
+      {:id "search-spinner"
+       :src "/static/img/loading.svg"
+       :alt "Searching..."}]]))
+
 (defn navbar [req]
   (let [user (s/current-user req)
+        nav-cls "w-full lg:flex lg:items-center lg:w-auto hidden transition-all duration-300 ease-in-out"
+        ul-cls "flex flex-col lg:flex-row lg:space-x-4"
+        a-cls "block py-2 hover:text-green-400 transition-colors"
         menu (when user
                (if (= :admin (:user/role user))
                  Menu
@@ -107,38 +137,19 @@
     [:nav.bg-gray-900.text-white
      [:div.container.mx-auto.flex.flex-wrap.items-center.justify-between.p-4
       [:a.text-2xl.font-bold {:href "/"} App-name]
-      [:button.block.lg:hidden {:id "menu-toggle"}
+      [:button {:class "block lg:hidden" :id "menu-toggle"}
        [:svg.w-6.h-6 {:fill "none" :stroke "currentColor"
                       :viewBox "0 0 24 24"}]]
       (when user
-        [:div#navbar.w-full.lg:flex.lg:items-center.lg:w-auto.hidden.transition-all.duration-300.ease-in-out
-         [:ul.flex.flex-col.lg:flex-row.lg:space-x-4
+        [:div#navbar {:class nav-cls}
+         [:ul {:class ul-cls}
           (for [m menu]
             [:li
-             [:a.block.py-2.hover:text-green-400.transition-colors
-              {:href (first m)} (last m)]])]
+             [:a {:class a-cls :href (first m)} (last m)]])]
          (when (or
                 (= :admin (:user/role user))
                 (contains? (into #{} (:user/privileges user)) :search))
-          [:form.flex.mt-4.lg:mt-0.lg:ml-4
-           {:_ "on submit
-                 set q to (value of the #input-q)
-                 if q.length is less than 2
-                    alert('请输入至少2个字符') then halt
-                 end"}
-           (c/csrf-token)
-           [:input.bg-white.rounded-l-md.border.border-gray-300.p-2.focus:outline-none.focus:ring-2.focus:ring-blue-400.focus:border-blue-500.transition.text-black
-            {:type "search" :name "q" :id "input-q" :required true}]
-           [:button.bg-green-500.hover:bg-green-600.text-white.p-2.rounded-t-md.transition
-           {:hx-post "/search"
-            :hx-target "body"
-            :hx-indicator "#search-spinner"
-            :type "submit"}
-            "搜索"]
-           [:img.htmx-indicator
-            {:id "search-spinner"
-             :src "/static/img/loading.svg"
-             :alt "Searching..."}]])])]]))
+           (search-form))])]]))
 
 (defn layout [req & body]
   (str

@@ -207,43 +207,67 @@
 
 (defn table-view
   [title headers keys data]
-  [:div.my-4
-   [:h1.text-2xl.font-bold.mb-6 title]
-   [:div.bg-white.rounded.shadow.overflow-hidden
-    [:table.w-full.border-collapse.border.border-gray-300
-     [:thead
-      [:tr.bg-blue-800
-       (for [h headers]
-         [:th.border.p-2.text-white.font-bold h])]]
-     [:tbody
-      (for [d data]
-        [:tr.odd:bg-blue-100.hover:bg-blue-200
-         (for [[k v] keys]
-           (if (map? d)
-             (case (type-of v)
-               :href-id
-               [:td.border-0.p-2
-                [:a
-                 {:href (str v (:db/id d))
-                  :class (if (contains?
-                              #{:button :button-new} k)
-                           "text-white bg-blue-600 hover:bg-blue-800 px-4 py-2 rounded"
-                           "text-blue-600 hover:text-blue-800 hover:underline transition-color")
-                  :target (if (= :button-new k)
-                            "_blank"
-                            "")}
-                 (k d)]]
-               :href-self
-               [:td.border-0.p-2
-                [:a.text-blue-600.hover:text-blue-800.hover:underline.transition-color
-                 {:href (str v (k d))}
-                 (k d)]]
-               :class
-               (td-class d k v)
-               [:td.border-0.p-2 (k d)])
-             (if v
-               [:td.border-0.p-2
-                [:a.text-blue-600.hover:text-blue-800.hover:underline.transition-color
-                 {:href (str v (d (count headers)))}
-                 (d k)]]
-               [:td.border-0.p-2 (d k)])))])]]]])
+  (let [a-cls "text-blue-600 hover:text-blue-800 hover:underline transition-color"]
+   [:div.my-4
+    [:h1.text-2xl.font-bold.mb-6 title]
+    [:div.bg-white.rounded.shadow.overflow-hidden
+     [:table.w-full.border-collapse.border.border-gray-300
+      [:thead
+       [:tr.bg-blue-800
+        (for [h headers]
+          [:th.border.p-2.text-white.font-bold h])]]
+      [:tbody
+       (for [d data]
+         [:tr.odd:bg-blue-100.hover:bg-blue-200
+          (for [[k v] keys]
+            (if (map? d)
+              (case (type-of v)
+                :href-id
+                [:td.border-0.p-2
+                 [:a
+                  {:href (str v (:db/id d))
+                   :class (if (contains?
+                               #{:button :button-new} k)
+                            "text-white bg-blue-600 hover:bg-blue-800 px-4 py-2 rounded"
+                            "text-blue-600 hover:text-blue-800 hover:underline transition-color")
+                   :target (if (= :button-new k)
+                             "_blank"
+                             "")}
+                  (k d)]]
+                :href-self
+                [:td.border-0.p-2
+                 [:a {:class a-cls :href (str v (k d))}
+                  (k d)]]
+                :class
+                (td-class d k v)
+                [:td.border-0.p-2 (k d)])
+              (if v
+                [:td.border-0.p-2
+                 [:a {:class a-cls :href (str v (d (count headers)))}
+                  (d k)]]
+                [:td.border-0.p-2 (d k)])))])]]]]))
+
+(defn form-input
+  [{:keys [type label id name value required placeholder]
+    :as opts
+    :or {required false
+         vlaue ""
+         placeholder ""
+         id name}}]
+  (let [input-cls "w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"]
+    [:div.my-2
+     [:label.block.text-sm.font-medium.text-gay-700.mb-1
+      {:for name} label]
+     [:input {:class input-cls
+              :type type
+              :name name
+              :id name
+              :value value
+              :required required
+              :placeholder placeholder}]]))
+
+(defn form-submit-btn
+  [v]
+  (let [cls "w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md cursor-pointer"]
+    [:div.my-2
+     [:input {:class cls :type "submit" :value v}]]))

@@ -16,7 +16,7 @@
    ["/olt" "GPON"]
    ["/project" "项目"]
    ["/alert" "故障告警"]
-   ["/change-passwd" "修改密码"]
+   ["/chpwd" "修改密码"]
    ["/logout" "登出"]])
 
 (defn paginator [req current-page pages base-url]

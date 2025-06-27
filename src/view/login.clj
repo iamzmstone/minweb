@@ -44,20 +44,12 @@
       (when-let [url (get-in req [:params "url"])]
         [:input {:type "hidden" :name "pre-url"
                  :value url}])
-      [:div.mb-4
-       [:label.block.text-sm.font-medium.text-gray-700.mb-1
-        {:for "email"} "E-Mail"]
-       [:input.w-full.px-4.py-2.bg-white.border.border-gray-300.rounded-md.focus:outline-none.focus:ring-2.focus:ring-blue-500
-        {:type "email" :name "email" :id "email" :required true
-         :placeholder "E-Mail"}]]
-      [:div.mb-6
-       [:label.block.text-sm.font-medium.text-gray-700.mb-1
-        {:for "password"} "密码"]
-       [:input.w-full.px-4.py-2.bg-white.border.border-gray-300.rounded-md.focus:outline-none.focus:ring-2.focus:ring-blue-500
-        {:type "password" :name "password" :id "password" :required true}]]
-      [:div.mb-4
-       [:input.w-full.bg-blue-600.hover:bg-blue-700.text-white.font-semibold.py-2.px-4.rounded-md.cursor-pointer
-        {:type "submit" :value "登录"}]]]]]))
+      (c/form-input {:type "email" :label "E-Mail"
+                     :name "email" :required true
+                     :placeholder "email"})
+      (c/form-input {:type "password" :label "密码"
+                     :name "password" :required true})
+      (c/form-submit-btn "登录")]]]))
 
 (defn chpwd-form
   [req]
@@ -66,29 +58,15 @@
    [:div.max-w-md.mx-auto.p-4
     [:div.bg-blue-100.shadow-md.rounded-lg.p-6
      [:h1.text-2xl.font-bold.mb-6.text-ceter "修改密码"]
-     [:form {:method "post" :action "/change-passwd"}
+     [:form {:method "post" :action "/chpwd"}
       (c/csrf-token)
-      [:div.mb-4
-       [:label.block.text-sm.font-medium.text-gray-700.mb-1
-        {:for "oldpass"} "原密码"]
-       [:input.w-full.bg-white.px-4.py-2.border.border-gray-300.rounded-md.focus:outline-none.focus:ring-2.focus:ring-blue-500
-        {:type "password" :name "oldpass" :id "oldpass" :required true
-         :placeholder "原密码"}]]
-      [:div.mb-4
-       [:label.block.text-sm.font-medium.text-gray-700.mb-1
-        {:for "newpass"} "新密码"]
-       [:input.w-full.bg-white.px-4.py-2.border.border-gray-300.rounded-md.focus:outline-none.focus:ring-2.focus:ring-blue-500
-        {:type "password" :name "newpass" :id "newpass" :required true
-         :placeholder "新密码"}]]
-      [:div.mb-6
-       [:label.block.text-sm.font-medium.text-gray-700.mb-1
-        {:for "newpass-confirm"} "新密码确认"]
-       [:input.w-full.bg-white.px-4.py-2.border.border-gray-300.rounded-md.focus:outline-none.focus:ring-2.focus:ring-blue-500
-        {:type "password" :name "newpass-confirm" :id "newpass-confirm"
-         :required true :placeholder "新密码确认"}]]
-      [:div.mb-4
-       [:input.w-full.bg-blue-600.hover:bg-blue-700.text-white.font-semibold.py-2.px-4.rounded-md.cursor-pointer
-        {:type "submit" :value "修改密码"}]]]]]))
+      (c/form-input {:type "password" :label "原密码"
+                     :name "oldpass" :required true})
+      (c/form-input {:type "password" :label "新密码"
+                     :name "newpass" :required true})
+      (c/form-input {:type "password" :label "新密码确认"
+                     :name "newpass-confirm" :required true})
+      (c/form-submit-btn "修改密码")]]]))
 
 (defn validate-passwd
   [npw npwc]
@@ -115,8 +93,8 @@
            (r/redirect "/")
            "success" "密码修改成功"))
         (r/flash-msg
-         (r/redirect "/change-passwd")
+         (r/redirect "/chpwd")
          "danger" "新密码长度必须大于5,必须匹配"))
       (r/flash-msg
-       (r/redirect "/change-passwd")
+       (r/redirect "/chpwd")
        "danger" "原密码错误"))))

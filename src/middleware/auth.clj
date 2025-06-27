@@ -6,7 +6,7 @@
    [utils.session :as session]))
 
 (def user-privs
-  #{"/" "/profile" "/change-passwd" "/logout"})
+  #{"/" "/profile" "/chpwd" "/logout"})
 
 (def privileges
   {:switch #{"/switch" "/sw-info" "/vlan"}

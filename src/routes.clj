@@ -44,5 +44,7 @@
      (http-get "/login" login/index)
      (http-get "/logout" login/logout)
      (http-post "/login" login/login)
+     (http-get "/chpwd" login/chpwd-form)
+     (http-post "/chpwd" login/change-passwd)
      (http-post "/change-page-size" core/change-page-size)
      ] %))

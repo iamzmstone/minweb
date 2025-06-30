@@ -218,7 +218,7 @@
           [:th.border.p-2.text-white.font-bold h])]]
       [:tbody
        (for [d data]
-         [:tr.odd:bg-blue-100.hover:bg-blue-200
+         [:tr {:class "odd:bg-blue-100 hover:bg-blue-200"}
           (for [[k v] keys]
             (if (map? d)
               (case (type-of v)
@@ -229,7 +229,7 @@
                    :class (if (contains?
                                #{:button :button-new} k)
                             "text-white bg-blue-600 hover:bg-blue-800 px-4 py-2 rounded"
-                            "text-blue-600 hover:text-blue-800 hover:underline transition-color")
+                            a-cls)
                    :target (if (= :button-new k)
                              "_blank"
                              "")}
@@ -249,9 +249,8 @@
 
 (defn form-input
   [{:keys [type label id name value required placeholder]
-    :as opts
     :or {required false
-         vlaue ""
+         value ""
          placeholder ""
          id name}}]
   (let [input-cls "w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"]
@@ -261,7 +260,7 @@
      [:input {:class input-cls
               :type type
               :name name
-              :id name
+              :id id
               :value value
               :required required
               :placeholder placeholder}]]))

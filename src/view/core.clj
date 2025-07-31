@@ -189,6 +189,16 @@
          {:_ "on click add .opacity-0 to #flashMessage"
           :class "ml-4 text-white font-bold"} "x"]]))))
 
+(defn input-filter
+  []
+  [:input
+   {:class "w-full my-2 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    :type "text"
+    :placeholder "请输入过滤信息"
+    :_ "on input show <tbody>tr/> in <table/>
+                    when its textContent.toLowerCase()
+                    contains my value.toLowerCase()"}])
+
 (defn code-page [_req title content]
   (str
    (h/html
@@ -247,12 +257,26 @@
                   (d k)]]
                 [:td.border-0.p-2 (d k)])))])]]]]))
 
+(defn table-view-with-rownum
+  [title headers keys data]
+  (let [headers (into ["行号"] headers)
+        cnt (count data)
+        [keys data]
+        (if (map? (first data))
+          [(into [[:rownum :rownum]] keys)
+           (mapv #(assoc %2 :rownum (str "#" %1))
+                 (range 1 (inc cnt)) data)]
+          [(into [[0 :rownum]]
+                 (mapv #(vector % nil) (range 1 (count headers))))
+           (mapv #(into [(str "#" %1)] %2)
+                 (range 1 (inc cnt)) data)])]
+    (table-view title headers keys data)))
+
 (defn form-input
   [{:keys [type label id name value required placeholder]
     :or {required false
          value ""
-         placeholder ""
-         id name}}]
+         placeholder ""}}]
   (let [input-cls "w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"]
     [:div.my-2
      [:label.block.text-sm.font-medium.text-gay-700.mb-1

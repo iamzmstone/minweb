@@ -294,3 +294,46 @@
   (let [cls "w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md cursor-pointer"]
     [:div.my-2
      [:input {:class cls :type "submit" :value v}]]))
+
+(defn tabs-view
+  [title tabs pages]
+  (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"
+        btn-cls "tab-button px-12 py-4 text-left font-medium bg-amber-100 hover:bg-amber-200 hover:text-blue-600 transition-colors border-b-2 transition-border"]
+    [:div
+     [:h1 {:class "text-2xl md:text-3xl font-bold text-gray-900 mb-6"} title]
+     [:div.bg-white.rounded-xl.shadow-md.overflow-hidden
+      [:nav {:class nav-cls}
+       (for [tab tabs]
+         [:button
+          {:class (if (:default tab)
+                    (str btn-cls
+                         " text-blue-500 border-blue-500")
+                    (str btn-cls " border-transparent"))
+           :data-tab (:id tab)
+           :role "tab"
+           :aria-selected (if (:default tab) "true" "false")
+           :aria-controls (str (:id tab) "-content")
+           :_ (format
+               "on click
+                remove .text-blue-500 .border-blue-500 from .tab-button
+                then add .border-transparent to .tab-button
+                then set {aria-selected: 'false'} on .tab-button
+                then add .text-blue-500 .border-blue-500 to me
+                then remove .border-transparent from me
+                then set {aria-selected: 'true'} on me
+                then add .hidden to .tab-content
+                then set {aria-hidden: 'true'} on .tab-content
+                then remove .hidden from #%s-content
+                then set {aria-hidden: 'false'} on #%s-content"
+               (:id tab) (:id tab))}
+          (when (:icon tab) (:icon tab))
+          [:span (:text tab)]])]
+      [:div.p-6
+       (for [page pages]
+         [:div.tab-content.space-y-4
+          {:id (str (:id page) "-content")
+           :class (if (:default page) "" "hidden")
+           :role "tabpanel"
+           :aria-hidden (if (:default page) "false" "true")}
+          (:content page)])]]]))
+

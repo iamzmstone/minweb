@@ -124,32 +124,56 @@
        :src "/static/img/loading.svg"
        :alt "Searching..."}]]))
 
-(defn navbar [req]
-  (let [user (s/current-user req)
-        nav-cls "w-full lg:flex lg:items-center lg:w-auto hidden transition-all duration-300 ease-in-out"
-        ul-cls "flex flex-col lg:flex-row lg:space-x-4"
-        a-cls "block py-2 hover:text-green-400 transition-colors"
-        menu (when user
-               (if (= :admin (:user/role user))
-                 Menu
-                 (->> Menu
-                      (filter #(authorized? user (first %))))))]
+(defn navbar
+  [menu form-search]
+  (let [nav-cls "w-full lg:flex lg:items-center lg:w-auto hidden transition-all duration-300 ease-in-out"
+       ul-cls "flex flex-col lg:flex-row lg:space-x-4"
+       a-cls "block py-2 hover:text-green-400 transition-colors"]
     [:nav.bg-gray-900.text-white
      [:div.container.mx-auto.flex.flex-wrap.items-center.justify-between.p-4
       [:a.text-2xl.font-bold {:href "/"} App-name]
-      [:button {:class "block lg:hidden" :id "menu-toggle"}
-       [:svg.w-6.h-6 {:fill "none" :stroke "currentColor"
-                      :viewBox "0 0 24 24"}]]
+      [:button
+       {:class "block lg:hidden" :id "menu-toggle"
+        :_ "on click
+               toggle .hidden on #navbar"}
+       [:svg.w-6.h-6
+        {:fill "none" :stroke "currentColor"
+         :viewBox "0 0 24 24"}
+        [:path
+         {:stroke-linecap "round"
+          :stroke-linejoin "round"
+          :stroke-width="2"
+          :d "M4 6h16M4 12h16M4 18h16"}]]]
+      [:div#navbar
+       {:class nav-cls}
+       [:ul {:class ul-cls}
+        (for [m menu]
+          [:li
+           [:a {:class a-cls
+                :href (first m)}
+            (last m)]])]
+       (if form-search form-search "")]]]))
+
+(defn nav-view [req]
+  (let [user (s/current-user req)
+        form-search
+        (when
+         (or
+          (= :admin (:user/role user))
+          (contains?
+           (into #{} (:user/privileges user))
+           :search))
+          (search-form))
+        menu
+        (when user
+          (if (= :admin (:user/role user))
+            Menu
+            (->>
+             Menu
+             (filter
+              #(authorized? user (first %))))))]
       (when user
-        [:div#navbar {:class nav-cls}
-         [:ul {:class ul-cls}
-          (for [m menu]
-            [:li
-             [:a {:class a-cls :href (first m)} (last m)]])]
-         (when (or
-                (= :admin (:user/role user))
-                (contains? (into #{} (:user/privileges user)) :search))
-           (search-form))])]]))
+        (navbar menu form-search))))
 
 (defn layout [req & body]
   (str
@@ -166,7 +190,7 @@
               :rel "stylesheet"}]]
      [:body.min-h-screen.flex.flex-col
       [:div.flex-1
-       (navbar req)
+       (nav-view req)
        (c/alert req)
        [:div.mx-8.mt-2
         body]]

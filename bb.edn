@@ -9,4 +9,5 @@
   {:git/url "https://github.com/m3tti/ring-anti-forgery"
    :git/sha "4e226df604dca13d5c93be4d4900367a64f5963e"}}
  :tasks
- {start-web core/-main}}
+ {start-web core/-main
+  db-seed database.user/default-user}}

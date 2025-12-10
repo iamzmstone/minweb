@@ -9,5 +9,10 @@
   {:git/url "https://github.com/m3tti/ring-anti-forgery"
    :git/sha "4e226df604dca13d5c93be4d4900367a64f5963e"}}
  :tasks
- {start-web core/-main
-  db-seed database.user/default-user}}
+  {tailwindcss {:doc "Generate tailwindcss out file"
+               :task (shell "tailwindcss -i resources/tw_input.css -o resources/public/css/tw_out.css")}
+  start-web {:doc "Start web application"
+             :depends [tailwindcss]
+             :task core/-main}
+  db-seed {:doc "Seed data: default admin user"
+           :task database.user/default-user}}}

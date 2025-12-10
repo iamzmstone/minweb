@@ -3,6 +3,8 @@
    [ruuter.core :as ruuter]
    [static :as static]
    [view.index :as index]
+   [view.admin.core :as admin]
+   [view.admin.user :as usradmin]
    [view.core :as core]
    [view.login :as login]))
 
@@ -13,7 +15,7 @@
    :response (fn [req]
                (let [resp (response-fn req)]
                  (if (string? resp)
-                   {:status 200
+                   {:sttus 200
                     :body resp}
                    resp)))})
 
@@ -46,5 +48,11 @@
      (http-post "/login" login/login)
      (http-get "/chpwd" login/chpwd-form)
      (http-post "/chpwd" login/change-passwd)
+     (http-get "/admin" admin/index)
+     (http-get "/mgmt/:type" admin/layout)
+     (http-get "/show-modal/:type/:id" admin/show-modal)
+     (http-post "/add-usr" usradmin/add-user)
+     (http-get "/delete-it/:type/:id" admin/delete-it)
+     (http-get "/val-uniq/:type" admin/val-uniq)
      (http-post "/change-page-size" core/change-page-size)
      ] %))

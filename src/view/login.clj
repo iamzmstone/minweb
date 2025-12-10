@@ -86,7 +86,7 @@
           (add {:email (:user/email user)
                 :name (:user/name user)
                 :role (:user/role user)
-                :privs (:user/privileges user)
+                :privs (:user/privs user)
                 :password npw})
           (c/log-user req "change password successfully")
           (r/flash-msg

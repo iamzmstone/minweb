@@ -93,6 +93,7 @@
 (defn bs-to-tw
   [cls]
   (case cls
+    :rownum "italic font-medium text-amber-900"
     :text-success "text-green-500"
     :text-warning "text-yellow-500"
     :text-danger "text-red-500 font-bold"

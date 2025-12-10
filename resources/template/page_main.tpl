@@ -8,9 +8,8 @@
           content="width=device-width, initial-scale=1.0">
 
     <title>系统管理</title>
-    <script src="/static/css/tailwind.css"></script>
-    <!-- <link rel="stylesheet" href="/static/css/tw_out.css"/> -->
-    <link rel="stylesheet" href="/static/css/style_admin.css"/>
+    <link rel="stylesheet" href="/static/css/tw_out.css"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <div class="flex flex-1">

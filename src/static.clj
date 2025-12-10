@@ -107,8 +107,7 @@
 
 ;; https://github.com/ring-clojure/ring/blob/master/ring-core/src/ring/util/mime_type.clj
 (defn ext-mime-type
-  "Get the mimetype from the filename extension. Takes an optional map of
-  extensions to mimetypes that overrides values in the default-mime-types map."
+  "Get the mimetype from the filename extension. Takes an optional map of extensions to mimetypes that overrides values in the default-mime-types map."
   ([filename]
    (ext-mime-type filename {}))
   ([filename mime-types]
@@ -120,5 +119,4 @@
   [req]
   (let [path (str "public/" (str/replace-first (:uri req) "/static/" ""))]
     {:headers {"Content-Type" (ext-mime-type (fs/file-name path))}
-     :body ((memoize slurp) (io/resource path))}))
-
+     :body (fs/file "resources" path)}))

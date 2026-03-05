@@ -19,7 +19,7 @@
 (def Public-dir "resources/public")
 (def Utf8-bom "\uFEFF")
 
-(def env (load-config))
+(def env (load-config :file "resources/config.edn"))
 
 (defn windows
   []

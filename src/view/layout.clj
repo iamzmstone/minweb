@@ -8,16 +8,13 @@
    [view.core :as c]))
 
 
-(def Title (or (env :title) "网管2.0"))
+(def Title (or (env :title) "Min's web app framework"))
 (def App-name (or (env :app-name) "Minweb"))
 (def Menu
   [["/admin" "后台管理"]
-   ["/switch" "交换机"]
-   ["/olt" "GPON"]
-   ["/project" "项目"]
-   ["/alert" "故障告警"]
    ["/chpwd" "修改密码"]
-   ["/logout" "登出"]])
+   ["/logout" "登出"]
+   ["/about" "关于"]])
 
 (defn paginator [req current-page pages base-url]
   (let* [sizes [20 40 60 80]
@@ -196,7 +193,7 @@
         body]]
       [:footer.bg-gray-100.py-4.mt-4
        [:div.container.mx-auto.text-center.text-gray-500.text-sm
-        "© 2025 绍兴电信云中台"]]
+        "© 2026 iamzmstone"]]
       [:script {:src "/static/js/htmx.min.js"}]
       [:script {:src "/static/js/hyperscript.min.js"}]]])))
 

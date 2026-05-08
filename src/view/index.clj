@@ -7,17 +7,15 @@
 (def Title (or (env :title) "Web Application"))
 
 (defn page [req]
-  (let [subtitle "集成多种能力"
-        topics [["交换机管理" "bg-blue-500" {:href "/switch" :txt "交换机信息"}
-                 "交换机的重要端口状态和流量检测，VLAN和子网管理, 配置文件自动备份"]
-                ["PON管理" "bg-yellow-500" {:href "/olt" :txt "PON信息"}
-                 "OLT配置管理，ONU状态、光衰、流量检测"]
-                ["项目设备管理" "bg-pink-500" {:href "/project" :txt "项目点位信息"}
-                 "按项目分组显示在线设备,离线设备,设备网络在线率"]
-                ["综合搜索能力" "bg-orange-500" nil
-                 "通过IP地址、SN号等信息全方位搜索网络和故障信息"]
-                ["故障管理" "bg-purple-500" {:href "/alert" :txt "故障告警"}
-                 "重要光路的状态、流量监测，IP在线率监测，故障显示和告警"]]]
+  (let [subtitle "subtitle"
+        topics [["topic1" "bg-blue-500" {:href "/topic1" :txt "topic1 information"}
+                 "description of topic1"]
+                ["topic2" "bg-blue-500" {:href "/topic2" :txt "topic2 information"}
+                 "description of topic2"]
+                ["topic3" "bg-blue-500" {:href "/topic3" :txt "topic3 information"}
+                 "description of topic3"]
+                ["topic4" "bg-blue-500" {:href "/topic4" :txt "topic4 information"}
+                 "description of topic4"]]]
     (layout
      req
      [:div.container.mx-auto.p-4

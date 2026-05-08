@@ -41,7 +41,7 @@
 
 (def routes
   #(ruuter/route
-    [(http-get "/static/:filename" static/serve-static)
+    [(http-get "/static/:filename*" static/serve-static)
      (http-get "/" index/page)
      (http-get "/login" login/index)
      (http-get "/logout" login/logout)

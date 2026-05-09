@@ -43,7 +43,7 @@
   [user path]
   (if (= :admin (:user/role user))
     true
-    (let [privs (->> (:user/privileges user)
+    (let [privs (->> (:user/privs user)
                      (reduce #(concat %1 (privileges %2))
                              user-privs)
                      (into #{}))]

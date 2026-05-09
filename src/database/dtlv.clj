@@ -130,6 +130,11 @@
     (doseq [eid eids]
       (del-ent eid))))
 
+(defn update-ent
+  [eid attrs]
+  (when (pos-int? eid)
+    (d/transact! Conn (mapv #(merge {:db/id eid} %) attrs))))
+
 (defn prj-devices
   [prj-eid]
   (let [q '[:find

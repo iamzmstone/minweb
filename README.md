@@ -30,3 +30,19 @@ minweb/
   ├── db/                   # SQLite database
   ├── bb.edn                # Babashka build config
   └── schema.edn            # Database schema definition
+
+## Commands
+
+```bash
+# Start web application (depends on tailwindcss)
+bb start-web
+
+# Generate tailwindcss
+bb tailwindcss
+
+# Seed database with test data
+bb db-seed
+
+# Run a single bb task
+bb <task-name>
+```

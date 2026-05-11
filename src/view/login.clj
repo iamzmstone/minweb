@@ -6,7 +6,8 @@
    [view.core :as c]
    [view.layout :as l]
    [database.user
-    :refer [correct-password? the-user passwd-ok? add]]))
+    :refer [correct-password? the-user passwd-ok? add]]
+   [middleware.rate-limit :refer [get-client-ip record-failed record-success]]))
 
 (defn logout [req]
   (c/log-user req "logout")
@@ -16,19 +17,23 @@
          :session nil))
 
 (defn login [req]
-  (let [email (get-in req [:params "email"])
+  (let [ip (get-client-ip req)
+        email (get-in req [:params "email"])
         passwd (get-in req [:params "password"])
         url (get-in req [:params "pre-url"] "/")]
     (if (correct-password?
          email passwd)
-      (let [user (the-user email)]
-        (log/info "User" (:user/name user) "logined in")
-        (assoc (r/flash-msg
-                (r/redirect url)
-                "success" (str (:user/name user) ", 登陆系统成功"))
-               :session {:user-id (:db/id user)}))
       (do
-        (log/warn "User" email "login failed")
+        (record-success ip)
+        (let [user (the-user email)]
+          (log/info "User" (:user/name user) "logined in")
+          (assoc (r/flash-msg
+                  (r/redirect url)
+                  "success" (str (:user/name user) ", 登陆系统成功"))
+                 :session {:user-id (:db/id user)})))
+      (do
+        (record-failed ip)
+        (log/warn "Login failed for" email)
         (r/flash-msg
          (r/redirect "/login")
          "danger" "用户名或密码错误")))))

@@ -3,4 +3,6 @@
  :dtlv-opts "db/dtlv.db"
  :page-size 20
  :init-email "admin@example.com"
- :init-pwd "change-me-after-first-login"}
+ :init-pwd "change-me-after-first-login"
+ :rate-limit-max-attempts 5
+ :rate-limit-lockout-minutes 15}

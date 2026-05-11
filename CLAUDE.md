@@ -32,7 +32,7 @@ bb start-web --port 3000
 Request → ruuter routing → middleware chain → view handlers → Hiccup2 HTML
 
 Middleware chain (in core.clj):
-  wrap-auth → wrap-anti-forgery → wrap-flash → wrap-session → wrap-multipart-params → wrap-params
+  wrap-rate-limit → wrap-auth → wrap-anti-forgery → wrap-flash → wrap-session → wrap-multipart-params → wrap-params
 ```
 
 ### Key Files
@@ -40,6 +40,7 @@ Middleware chain (in core.clj):
 - `src/routes.clj` - Route definitions using ruuter DSL
 - `src/database/dtlv.clj` - Datalevin operations (schema, queries, transactions)
 - `src/middleware/auth.clj` - Auth checks, privilege-based authorization
+- `src/middleware/rate-limit.clj` - Login rate limiting (per-IP attempt tracking)
 - `src/view/layout.clj` - Base HTML layout with navbar, pagination
 
 ### Database Schema

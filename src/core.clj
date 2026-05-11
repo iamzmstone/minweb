@@ -8,6 +8,7 @@
    [ring.middleware.params :as p]
    [ring.middleware.flash :as f]
    [middleware.auth :as auth]
+   [middleware.rate-limit :as rate-limit]
    [taoensso.timbre :as log]
    [taoensso.timbre.appenders.core :as appenders]
    [org.httpkit.server :as srv]))
@@ -36,6 +37,7 @@
           (srv/run-server
            (->
             #'ro/routes
+            (rate-limit/wrap-rate-limit ["/login" "/chpwd"])
             auth/wrap-auth
             (af/wrap-anti-forgery {:anti-forgery true
                                    :token-expiry (* 60 60 24)})

@@ -83,13 +83,13 @@
 
 (defn ip-to-int
   [ip]
-  (try
-    (reduce (fn [sum octet]
-              (+ (bit-shift-left sum 8)
-                 (parse-long octet)))
-            0 (str/split ip #"\."))
-    (catch Exception e
-      (println "Error: ip-to-int" ip (.getMessage e)))))
+  (when ip
+    (try
+      (reduce (fn [sum octet]
+                (+ (bit-shift-left sum 8)
+                   (parse-long octet)))
+              0 (str/split ip #"\."))
+      (catch Exception _ nil))))
 
 (defn ip-in-net
   [ip mask gw]

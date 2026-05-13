@@ -40,7 +40,7 @@ Middleware chain (in core.clj):
 - `src/routes.clj` - Route definitions using ruuter DSL
 - `src/database/dtlv.clj` - Datalevin operations (schema, queries, transactions)
 - `src/middleware/auth.clj` - Auth checks, privilege-based authorization
-- `src/middleware/rate-limit.clj` - Login rate limiting (per-IP attempt tracking)
+- `src/middleware/rate_limit.clj` - Login rate limiting (per-IP attempt tracking)
 - `src/view/layout.clj` - Base HTML layout with navbar, pagination
 
 ### Database Schema

@@ -24,11 +24,11 @@
 
 (defn is-locked? [ip now]
   (let [attempts @login-attempts
-        entry (get attempts ip)]
-    (when entry
-      (let [count (:count entry)
-            ts (:ts entry)
-            expiry (+ ts (* (lockout-minutes) 60 1000))]
+        entry (get attempts ip)
+        count (:count entry)
+        ts (:ts entry)]
+    (when (and entry count ts)
+      (let [expiry (+ ts (* (lockout-minutes) 60 1000))]
         (when (and (>= count (max-attempts)) (< now expiry))
           {:remaining-secs (quot (- expiry now) 1000)
            :attempts count})))))

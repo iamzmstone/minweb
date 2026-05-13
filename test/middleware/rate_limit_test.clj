@@ -18,6 +18,38 @@
                     :ip2 {:count 2 :ts recent-ts}}]
       (let [result (rl/clean-expired attempts now)]
         (is (nil? (get result :ip1)))
-        (is (some? (get result :ip2)))))))
+        (is (some? (get result :ip2))))))
+  (testing "handles empty entry map without NPE"
+    (let [now (System/currentTimeMillis)
+          attempts {:bad-ip {}
+                    :good-ip {:count 1 :ts (- now (* 20 60 1000))}}]
+      (let [result (rl/clean-expired attempts now)]
+        (is (nil? (get result :bad-ip)))
+        (is (nil? (get result :good-ip))))))
+  (testing "handles entry with nil ts without NPE"
+    (let [now (System/currentTimeMillis)
+          attempts {:bad-ip {:count 1 :ts nil}}]
+      (let [result (rl/clean-expired attempts now)]
+        (is (nil? (get result :bad-ip)))))))
+
+(deftest is-locked?-test
+  (testing "detects locked IP"
+    (let [now (System/currentTimeMillis)
+          _ (reset! rl/login-attempts {:locked-ip {:count 5 :ts now}})]
+      (let [lock-info (rl/is-locked? :locked-ip now)]
+        (is (some? lock-info))
+        (is (pos? (:remaining-secs lock-info))))))
+  (testing "allows non-locked IP"
+    (let [now (System/currentTimeMillis)
+          _ (reset! rl/login-attempts {:normal-ip {:count 2 :ts now}})]
+      (is (nil? (rl/is-locked? :normal-ip now)))))
+  (testing "returns nil for empty entry"
+    (let [now (System/currentTimeMillis)
+          _ (reset! rl/login-attempts {:empty-ip {}})]
+      (is (nil? (rl/is-locked? :empty-ip now)))))
+  (testing "returns nil for entry with nil ts"
+    (let [now (System/currentTimeMillis)
+          _ (reset! rl/login-attempts {:nil-ts-ip {:count 5 :ts nil}})]
+      (is (nil? (rl/is-locked? :nil-ts-ip now))))))
 
 (run-tests)

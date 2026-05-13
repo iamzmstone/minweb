@@ -20,7 +20,10 @@
   (or (env :rate-limit-lockout-minutes) 15))
 
 (defn clean-expired [attempts now]
-  (into {} (filter #(> now (:ts (:val %))) attempts)))
+  (into {} (filter (fn [[ip entry]]
+                     (when-let [ts (:ts entry)]
+                       (<= now ts)))
+                   attempts)))
 
 (defn is-locked? [ip now]
   (let [attempts @login-attempts

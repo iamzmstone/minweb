@@ -401,6 +401,23 @@
      (when label
        [:label {:for (:id opts name) :class "ml-2 block text-sm text-gray-700"} label])]))
 
+(defn form-toggle [{:keys [label name value checked disabled class]
+                   :or {checked false}
+                   :as opts}]
+  (let [disabled-c (when disabled "opacity-50 cursor-not-allowed")]
+    [:div.my-2.flex.items-center
+     [:input
+      {:type "checkbox"
+       :name name
+       :id (:id opts name)
+       :value (or value "on")
+       :checked checked
+       :disabled disabled
+       :class (str "sr-only peer " disabled-c " " (or class ""))
+       :_ "on click toggle .hidden on next .toggle-content"}]
+     (when label
+       [:label {:for (:id opts name) :class "ml-2 block text-sm text-gray-700"} label])]))
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

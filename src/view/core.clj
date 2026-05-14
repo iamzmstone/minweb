@@ -447,6 +447,17 @@
       (when icon
         [:div {:class icon}])]]))
 
+(defn breadcrumb [{:keys [items class] :as opts}]
+  [:nav {:class (str "flex items-center space-x-2 text-sm " (or class "")) :aria-label "breadcrumb"}
+   [:ol.flex.items-center.space-x-2
+    (for [[i item] (map-indexed vector items)]
+      [:li.flex.items-center
+       (if (= i (dec (count items)))
+         [:span.text-gray-700.font-medium (if (map? item) (:label item) item)]
+         [:<>
+          [:a {:href (if (map? item) (:href item "#") "#") :class "text-blue-600 hover:underline"} (if (map? item) (:label item) item)]
+          [:span.text-gray-400 "/"]])])]])
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

@@ -529,6 +529,19 @@
                          (if is-active "bg-blue-100 text-blue-700" "text-gray-700 hover:bg-gray-100"))}
            (:label item)]))]]))
 
+(defn accordion [{:keys [items class]
+                :as opts}]
+  [:div {:class (str "space-y-2 " (or class ""))}
+   (for [[i item] (map-indexed vector items)]
+     (let [id (str "accordion-" i)]
+       [:div {:class "border border-gray-200 rounded-lg"}
+        [:button {:class "w-full px-4 py-3 text-left flex justify-between items-center hover:bg-gray-50"
+                 :_ (format "on click toggle .hidden on #%s-content" id)}
+         [:span {:class "font-medium text-gray-900"} (:title item)]
+         [:span {:class "transform transition-transform"} "▾"]]
+        [:div {:id (str id "-content") :class "hidden px-4 py-3 text-gray-600"}
+         (:content item)]]))])
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

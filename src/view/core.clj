@@ -484,6 +484,17 @@
     [:div {:class (str "fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg text-white " type-c " " (or class ""))}
      message]))
 
+(defn confirm-dialog [{:keys [title message confirm-text cancel-text class]
+                        :or {confirm-text "Confirm" cancel-text "Cancel"}
+                        :as opts}]
+  [:div {:class (str "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 " (or class ""))}
+   [:div {:class "bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"}
+    [:h3 {:class "text-lg font-semibold text-gray-900 mb-2"} title]
+    [:p {:class "text-gray-600 mb-6"} message]
+    [:div {:class "flex justify-end space-x-3"}
+     [:button {:class "px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"} cancel-text]
+     [:button {:class "px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md"} confirm-text]]]])
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

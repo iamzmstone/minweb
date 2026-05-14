@@ -3,12 +3,16 @@
             [view.core :as c]))
 
 (deftest badge-test
-  (testing "renders badge with correct color classes"
-    (is (vector? (c/badge :primary "text")))
-    (is (vector? (c/badge :success "text")))
-    (is (vector? (c/badge :warning "text")))
-    (is (vector? (c/badge :danger "text")))
-    (is (vector? (c/badge :info "text")))))
+  (testing "renders badge with correct variant and size"
+    (is (vector? (c/badge "text" {:variant :primary})))
+    (is (vector? (c/badge "text" {:variant :success})))
+    (is (vector? (c/badge "text" {:variant :warning})))
+    (is (vector? (c/badge "text" {:variant :danger})))
+    (is (vector? (c/badge "text" {:variant :info})))
+    (is (vector? (c/badge "text" {:variant :secondary})))
+    (is (vector? (c/badge "text" {:size :xs})))
+    (is (vector? (c/badge "text" {:size :sm})))
+    (is (vector? (c/badge "text" {:size :md})))))
 
 (deftest callout-test
   (testing "renders callout with severity-based styling"
@@ -111,12 +115,22 @@
       (is (= {:page-size 50} (:session resp))))))
 
 (deftest form-input-test
-  (testing "renders form input"
+  (testing "renders form input with label"
     (let [result (c/form-input {:type "text" :label "Name" :name "name" :required true})]
       (is (vector? result))
       (is (= :div.my-2 (first result)))))
   (testing "renders with default values"
     (let [result (c/form-input {:type "text" :label "Name" :name "name"})]
+      (is (vector? result))))
+  (testing "renders with size variants"
+    (is (vector? (c/form-input {:name "xs" :size :xs})))
+    (is (vector? (c/form-input {:name "lg" :size :lg}))))
+  (testing "renders with error state"
+    (let [result (c/form-input {:name "error" :variant :error :error "Invalid input"})]
+      (is (vector? result))
+      (is (= :div.my-2 (first result)))))
+  (testing "renders disabled state"
+    (let [result (c/form-input {:name "disabled" :disabled true})]
       (is (vector? result)))))
 
 (deftest form-submit-btn-test

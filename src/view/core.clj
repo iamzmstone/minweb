@@ -17,18 +17,47 @@
            :name "__anti-forgery-token"
            :value af/*anti-forgery-token*}])
 
+;; ========================================
+;; Component Configuration
+;; ========================================
+
+(def badge-variant-classes
+  {:primary "bg-purple-200 text-purple-800"
+   :info "bg-blue-200 text-blue-800"
+   :success "bg-green-200 text-green-800"
+   :warning "bg-yellow-200 text-yellow-800"
+   :danger "bg-red-200 text-red-500"
+   :secondary "bg-gray-200 text-gray-800"})
+
+(def badge-size-classes
+  {:xs "text-xs px-2 py-0.5"
+   :sm "text-xs px-2.5 py-0.5"
+   :md "text-sm px-3 py-1"})
+
+(def input-size-classes
+  {:xs "px-2 py-1 text-xs"
+   :sm "px-3 py-1.5 text-sm"
+   :md "px-4 py-2 text-base"
+   :lg "px-5 py-2.5 text-lg"})
+
+(defn merge-classes
+  "Join classes, filtering out blank strings."
+  [& classes]
+  (str/join " " (remove str/blank? classes)))
+
 (defn badge
-  [type text]
-  (let [color
-        (case type
-          :primary "bg-purple-200 text-purple-800"
-          :info "bg-blue-200 text-blue-800"
-          :success "bg-green-200 text-green-800"
-          :warning "bg-yellow-200 text-yellow-800"
-          :danger "bg-red-200 text-red-500"
-          "bg-indigo-200 text-indigo-800")]
-    [:span.inline-flex.items-center.rounded-full.text-xs.font-medium.font-bold
-     {:class (str color " px-2.5 py-0.5")}
+  "Badge with variant and size support.
+
+   Options:
+   - :variant - :primary, :info, :success, :warning, :danger, :secondary (default :info)
+   - :size - :xs, :sm, :md (default :sm)
+   - :class - extra CSS classes"
+  [text {:keys [variant size class]
+         :or {variant :info size :sm}
+         :as opts}]
+  (let [variant-c (get badge-variant-classes variant)
+        size-c (get badge-size-classes size)]
+    [:span {:class (merge-classes "inline-flex items-center rounded-full font-medium" variant-c size-c class)}
      text]))
 
 (defn callout
@@ -274,21 +303,44 @@
     (table-view title headers keys data)))
 
 (defn form-input
-  [{:keys [type label id name value required placeholder]
-    :or {required false
-         value ""
-         placeholder ""}}]
-  (let [input-cls "w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"]
+  "Form input with consistent API.
+
+   Options:
+   - :type - input type (text, email, password, number, etc.)
+   - :label - label text
+   - :name - input name
+   - :size - :xs, :sm, :md, :lg (default :md)
+   - :variant - :default, :error (adds red border)
+   - :disabled - boolean
+   - :required - boolean
+   - :placeholder - placeholder text
+   - :value - default value
+   - :class - extra CSS classes
+   - :error - error message text"
+  [{:keys [type label name size variant disabled required placeholder value class id error]
+    :or {type "text" size :md variant :default required false}
+    :as opts}]
+  (let [size-c (get input-size-classes size)
+        variant-c (case variant
+                     :error "border-red-500 focus:ring-red-500"
+                     :default "border-gray-300 focus:ring-blue-500")
+        base "w-full bg-white border rounded-md focus:outline-none focus:ring-2 transition"
+        disabled-c (when disabled "opacity-50 cursor-not-allowed")
+        label-c (str "block text-sm font-medium mb-1"
+                    (if (= variant :error) " text-red-600" " text-gray-700"))]
     [:div.my-2
-     [:label.block.text-sm.font-medium.text-gay-700.mb-1
-      {:for name} label]
-     [:input {:class input-cls
-              :type type
-              :name name
-              :id id
-              :value value
-              :required required
-              :placeholder placeholder}]]))
+     (when label [:label {:for name :class label-c} label])
+     [:input
+      {:type type
+       :name name
+       :id id
+       :class (merge-classes base size-c variant-c disabled-c (when disabled "cursor-not-allowed"))
+       :placeholder placeholder
+       :value value
+       :required required
+       :disabled disabled
+       :aria-disabled disabled}]
+     (when error [:span.text-sm.text-red-600.mt-1 error])]))
 
 (defn form-submit-btn
   [v]

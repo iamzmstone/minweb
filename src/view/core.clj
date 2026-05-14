@@ -542,6 +542,20 @@
         [:div {:id (str id "-content") :class "hidden px-4 py-3 text-gray-600"}
          (:content item)]]))])
 
+(defn tree-view [{:keys [nodes class] :as opts}]
+  [:ul {:class (str "space-y-1 " (or class ""))}
+   (for [node nodes]
+     [:li
+      [:div.flex.items-center.py-1
+       (when (:children node)
+         [:button {:class "w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                  :_ "on click toggle .hidden on next .tree-children"} "▸"])
+       [:span.text-gray-700 (:label node)]]
+      (when (:children node)
+        [:ul {:class "tree-children hidden pl-5 border-l border-gray-200 ml-2"}
+         (for [child (:children node)]
+           [:li [:span.text-gray-600 (:label child)]])])])])
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

@@ -418,6 +418,24 @@
      (when label
        [:label {:for (:id opts name) :class "ml-2 block text-sm text-gray-700"} label])]))
 
+(defn card [{:keys [title content footer class variant]
+            :or {variant :default}
+            :as opts}]
+  (let [base "bg-white rounded-lg shadow-md overflow-hidden"
+        variant-c (case variant
+                     :default ""
+                     :bordered "border border-gray-200"
+                     :elevated "shadow-lg")
+        card-class (str base " " variant-c " " (or class ""))]
+    [:div {:class card-class}
+     (when title
+       [:div.p-4.border-b.border-gray-200
+        [:h3.font-semibold.text-lg.text-gray-800 title]])
+     (when content
+       [:div.p-4 content])
+     (when footer
+       [:div.p-4.border-t.border-gray-200.bg-gray-50 footer])]))
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

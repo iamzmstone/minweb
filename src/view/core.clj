@@ -348,6 +348,42 @@
     [:div.my-2
      [:input {:class cls :type "submit" :value v}]]))
 
+(defn form-select [{:keys [options prompt disabled size class error]
+                  :or {size :md}
+                  :as opts}]
+  (let [size-c (get {:xs "text-xs" :sm "text-sm" :md "text-base" :lg "text-lg"} size)
+        base "w-full bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none"
+        disabled-c (when disabled "opacity-50 cursor-not-allowed")
+        label-c "block text-sm font-medium text-gray-700 mb-1"]
+    [:div.my-2
+     (when (:label opts)
+       [:label {:for (:name opts) :class label-c} (:label opts)])
+     [:select
+      {:name (:name opts)
+       :disabled disabled
+       :class (str base " " size-c " " disabled-c " " (or class ""))}
+      (when prompt [:option {:value ""} prompt])
+      (for [[v l] options]
+        [:option {:value v} l])]
+     (when error [:span.text-sm.text-red-600.mt-1 error])]))
+
+(defn form-checkbox [{:keys [label name value checked disabled class]
+                     :or {checked false}
+                     :as opts}]
+  (let [base "w-full bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none"
+        disabled-c (when disabled "opacity-50 cursor-not-allowed")]
+    [:div.my-2.flex.items-center
+     [:input
+      {:type "checkbox"
+       :name name
+       :id (:id opts name)
+       :value (or value "on")
+       :checked checked
+       :disabled disabled
+       :class (str "h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 " disabled-c " " (or class ""))}]
+     (when label
+       [:label {:for (:id opts name) :class "ml-2 block text-sm text-gray-700"} label])]))
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

@@ -467,6 +467,16 @@
      (when description [:p.text-gray-500.mb-6 description])
      (when action [:div action])]))
 
+(defn progress-bar [{:keys [value max-val label variant class]
+                    :or {value 0 max-val 100 variant :default}
+                    :as opts}]
+  (let [pct (min 100 (max 0 (* 100 (/ value (float max-val)))))
+        variant-c (case variant :default "bg-blue-600" :success "bg-green-600" :warning "bg-yellow-600" :danger "bg-red-600" "bg-blue-600")]
+    [:div {:class (str "w-full " (or class ""))}
+     (when label [:div.text-sm.text-gray-600.mb-1 label])
+     [:div.h-2.w-full.bg-gray-200.rounded-full.overflow-hidden
+      [:div {:class (str "h-full rounded-full " variant-c) :style {:width (str pct "%")}}]]]))
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

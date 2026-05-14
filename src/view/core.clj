@@ -477,6 +477,13 @@
      [:div.h-2.w-full.bg-gray-200.rounded-full.overflow-hidden
       [:div {:class (str "h-full rounded-full " variant-c) :style {:width (str pct "%")}}]]]))
 
+(defn toast [{:keys [message type class]
+             :or {type :info}
+             :as opts}]
+  (let [type-c (case type :info "bg-blue-500" :success "bg-green-500" :warning "bg-yellow-500" :danger "bg-red-500" "bg-blue-500")]
+    [:div {:class (str "fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg text-white " type-c " " (or class ""))}
+     message]))
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

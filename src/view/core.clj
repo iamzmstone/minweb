@@ -515,6 +515,20 @@
      (when title [:h1 {:class "text-3xl font-bold text-gray-900 mb-6"} title])
      (when content [:div content])]))
 
+(defn sidebar [{:keys [title items active class]
+               :as opts}]
+  (let [base "w-64 bg-white border-r border-gray-200 min-h-screen"]
+    [:div {:class (str base " " (or class ""))}
+     (when title [:div {:class "p-4 border-b border-gray-200"}
+                  [:h2 {:class "text-lg font-semibold text-gray-800"} title]])
+     [:nav {:class "p-4"}
+      (for [item items]
+        (let [is-active (= (:id item) active)]
+          [:a {:href (:href item "#")
+               :class (str "block px-3 py-2 rounded-md text-sm font-medium "
+                         (if is-active "bg-blue-100 text-blue-700" "text-gray-700 hover:bg-gray-100"))}
+           (:label item)]))]]))
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

@@ -454,9 +454,18 @@
       [:li.flex.items-center
        (if (= i (dec (count items)))
          [:span.text-gray-700.font-medium (if (map? item) (:label item) item)]
-         [:<>
-          [:a {:href (if (map? item) (:href item "#") "#") :class "text-blue-600 hover:underline"} (if (map? item) (:label item) item)]
-          [:span.text-gray-400 "/"]])])]])
+         [:span.text-gray-400 "/"])
+       (when-not (= i (dec (count items)))
+         [:a {:href (if (map? item) (:href item "#") "#") :class "text-blue-600 hover:underline"} (if (map? item) (:label item) item)])])]])
+
+(defn empty-state [{:keys [icon title description action class]
+                   :as opts}]
+  (let [base "flex flex-col items-center justify-center py-12 px-4 text-center"]
+    [:div {:class (str base " " (or class ""))}
+     (when icon [:div.text-5xl.mb-4 icon])
+     (when title [:h3.font-semibold.text-lg.text-gray-900.mb-2 title])
+     (when description [:p.text-gray-500.mb-6 description])
+     (when action [:div action])]))
 
 (defn tabs-view
   [title tabs pages]

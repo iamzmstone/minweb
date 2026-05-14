@@ -384,6 +384,23 @@
      (when label
        [:label {:for (:id opts name) :class "ml-2 block text-sm text-gray-700"} label])]))
 
+(defn form-radio [{:keys [label name value checked disabled class group]
+                  :or {checked false}
+                  :as opts}]
+  (let [disabled-c (when disabled "opacity-50 cursor-not-allowed")
+        radio-name (or group name)]
+    [:div.my-2.flex.items-center
+     [:input
+      {:type "radio"
+       :name radio-name
+       :id (:id opts name)
+       :value (or value "on")
+       :checked checked
+       :disabled disabled
+       :class (str "h-4 w-4 rounded-full border-gray-300 text-blue-600 focus:ring-blue-500 " disabled-c " " (or class ""))}]
+     (when label
+       [:label {:for (:id opts name) :class "ml-2 block text-sm text-gray-700"} label])]))
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

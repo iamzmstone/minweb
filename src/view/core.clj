@@ -495,6 +495,26 @@
      [:button {:class "px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"} cancel-text]
      [:button {:class "px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md"} confirm-text]]]])
 
+(defn grid [{:keys [cols items class]
+           :or {cols 3}
+           :as opts}]
+  (let [col-class (case cols
+                    1 "grid-cols-1"
+                    2 "grid-cols-1 md:grid-cols-2"
+                    3 "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                    4 "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+                    (str "grid-cols-" cols))]
+    [:div {:class (str "grid gap-4 " col-class " " (or class ""))}
+     (for [item items]
+       [:div item])]))
+
+(defn container [{:keys [title content class]
+                 :as opts}]
+  (let [base "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"]
+    [:div {:class (str base " " (or class ""))}
+     (when title [:h1 {:class "text-3xl font-bold text-gray-900 mb-6"} title])
+     (when content [:div content])]))
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

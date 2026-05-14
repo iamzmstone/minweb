@@ -436,6 +436,17 @@
      (when footer
        [:div.p-4.border-t.border-gray-200.bg-gray-50 footer])]))
 
+(defn stat-card [{:keys [label value icon trend class]
+                 :as opts}]
+  (let [base "bg-white rounded-lg shadow p-6"]
+    [:div {:class (str base " " (or class ""))}
+     [:div.flex.items-center.justify-between
+      [:div
+       [:p.text-sm.text-gray-500.mb-1 label]
+       [:p.text-2xl.font-bold.text-gray-900 (str value)]]
+      (when icon
+        [:div {:class icon}])]]))
+
 (defn tabs-view
   [title tabs pages]
   (let [nav-cls "flex flex-col sm:flex-row border-b border-gray-200"

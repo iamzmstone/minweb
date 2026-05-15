@@ -5,7 +5,6 @@
    [view.index :as index]
    [view.admin.core :as admin]
    [view.admin.user :as usradmin]
-   [view.core :as core]
    [view.login :as login]
    [view.examples :as examples]))
 
@@ -55,6 +54,5 @@
      (http-post "/add-usr" usradmin/add-user)
      (http-get "/delete-it/:type/:id" admin/delete-it)
      (http-get "/val-uniq/:type" admin/val-uniq)
-     (http-post "/change-page-size" core/change-page-size)
      (http-get "/sample" examples/example-page)
      ] %))

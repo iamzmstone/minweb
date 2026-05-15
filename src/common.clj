@@ -1,7 +1,6 @@
 (ns common
   (:require
    [cprop.core :refer [load-config]]
-   [clojure.java.shell :refer [sh]]
    [clojure.java.io :as io]
    [clojure.data.csv :as csv]
    [cheshire.core :as json]

@@ -1,10 +1,24 @@
 (ns view.index
   (:require
    [common :refer [env]]
-   [view.core :refer [showbox]]
    [view.layout :refer [layout]]))
 
 (def Title (or (env :title) "Web Application"))
+
+(defn showbox
+  [subject color link remark]
+  (let [out-cls "p-6 bg-white rounded-lg shadow hover:shadow-lg hover:scale-105 transition-transform"]
+    [:div {:class out-cls}
+     [:div.flex.items-start.space-x-4
+      [:div.flex-shrink-0.w-8.h-8.rounded {:class color}]
+      [:div.flex-1.text-gray-700.text-sm.border-b.border-gray-200.pb-2
+       [:div.flex.justify-between
+        [:strong subject]
+        (when link
+          [:a {:class "text-blue-500 hover:underline"
+               :href (:href link)}
+           (:txt link)])]
+       [:span remark]]]]))
 
 (defn page [req]
   (let [subtitle "subtitle"

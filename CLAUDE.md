@@ -41,7 +41,8 @@ Middleware chain (in core.clj):
 - `src/database/dtlv.clj` - Datalevin operations (schema, queries, transactions)
 - `src/middleware/auth.clj` - Auth checks, privilege-based authorization
 - `src/middleware/rate_limit.clj` - Login rate limiting (per-IP attempt tracking)
-- `src/view/layout.clj` - Base HTML layout with navbar, pagination
+- `src/view/core.clj` - Reusable UI components (badge, card, form-input, stat-card, etc.)
+- `src/view/layout.clj` - Base HTML layout with navbar, pagination, dashboard
 
 ### Database Schema
 Defined in `schema.edn` using Datalevin's schema format. Current entities:
@@ -59,3 +60,17 @@ Views return Hiccup vectors which are converted to HTML strings in the layout. C
 ## Configuration
 - `resources/config.edn` - App configuration (loaded via cprop)
 - `schema.edn` - Database schema definition
+
+## Clojure/Hiccup Best Practices
+
+### 避免括号匹配错误
+- **分解为小函数**：将复杂 Hiccup 结构拆分为独立函数，减少单函数内嵌套层数
+- **分批次添加**：每添加少量代码就用 `clj-kondo --lint` 检查，避免堆积错误
+- **缩进规范**：每个子元素独立缩进，避免行尾堆积 `]`
+- **用 Write 而非 Edit**：大幅修改或新建文件时用 Write 工具完整重写
+- **写完即查**：完成修改后立即运行 `clj-kondo --lint`，有错立刻修复
+
+```bash
+# 检查括号匹配
+clj-kondo --lint src/view/layout.clj
+```

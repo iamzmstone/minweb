@@ -2,8 +2,7 @@
   (:require
    [common :refer [env]]
    [taoensso.timbre :as log]
-   [utils.response :as r]
-   [clojure.string :as str]))
+   [utils.response :as r]))
 
 (def login-attempts (atom {}))
 
@@ -20,7 +19,7 @@
   (or (env :rate-limit-lockout-minutes) 15))
 
 (defn clean-expired [attempts now]
-  (into {} (filter (fn [[ip entry]]
+  (into {} (filter (fn [[_ip entry]]
                      (when-let [ts (:ts entry)]
                        (<= now ts)))
                    attempts)))

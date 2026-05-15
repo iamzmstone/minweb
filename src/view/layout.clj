@@ -40,8 +40,8 @@
          :name "page-size"
          :onchange "this.form.submit()"}
         (for [s sizes]
-         [:option {:value s :selected (= ps s)}
-          s])]]]
+          [:option {:value s :selected (= ps s)}
+           s])]]]
      [:nav.relative.z-0.inline-flex.shadow-sm.-space-x-px
       {:aria-label "Pagination"}
       [:a {:class a-cls}
@@ -124,8 +124,8 @@
 (defn navbar
   [menu form-search]
   (let [nav-cls "w-full lg:flex lg:items-center lg:w-auto hidden transition-all duration-300 ease-in-out"
-       ul-cls "flex flex-col lg:flex-row lg:space-x-4"
-       a-cls "block py-2 hover:text-green-400 transition-colors"]
+        ul-cls "flex flex-col lg:flex-row lg:space-x-4"
+        a-cls "block py-2 hover:text-green-400 transition-colors"]
     [:nav.bg-gray-900.text-white
      [:div.max-w-7xl.mx-auto.flex.flex-wrap.items-center.justify-between.p-4
       [:a.text-2xl.font-bold {:href "/"} App-name]
@@ -139,7 +139,7 @@
         [:path
          {:stroke-linecap "round"
           :stroke-linejoin "round"
-          :stroke-width="2"
+          :stroke-width "2"
           :d "M4 6h16M4 12h16M4 18h16"}]]]
       [:div#navbar
        {:class nav-cls}
@@ -205,3 +205,42 @@
       [:button.btn-close {:type "button" :data-bs-dismiss "modal"}]]
      [:div.modal-body content]
      [:div.modal-footer actions]]]])
+
+(defn dashboard-sidebar-item [item]
+  [:li
+   [:a {:href (:href item)
+        :class (str "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors "
+                    (if (:active item)
+                      "bg-purple-600 text-white"
+                      "text-gray-300 hover:bg-gray-700 hover:text-white"))}
+    (when (:icon item) [:span (:icon item)])
+    [:span (:label item)]]])
+
+(defn dashboard-sidebar [title items]
+  [:aside {:class "flex flex-col w-64 bg-gray-900 text-white min-h-screen"}
+   [:div {:class "p-6 border-b border-gray-700"}
+    [:h2 {:class "text-xl font-bold"} title]]
+   [:nav {:class "flex-1 px-4 py-4"}
+    [:ul {:class "space-y-2"}
+     (for [item items]
+       (dashboard-sidebar-item item))]]])
+
+(defn dashboard-layout [req sidebar-items & body]
+  (str
+   "<!DOCTYPE html>"
+   (h/html
+    [:html
+     [:head
+      [:meta {:charset "utf-8"}]
+      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
+      [:title Title]
+      [:link {:href "/static/css/tw_out.css" :rel "stylesheet"}]]
+     [:body.min-h-screen.bg-gray-100
+      [:div.flex
+       (dashboard-sidebar App-name sidebar-items)
+       [:div.flex-1.flex.flex-col
+        (nav-view req)
+        [:main.flex-1.p-6
+         body]]]
+      [:script {:src "/static/js/htmx.min.js"}]
+      [:script {:src "/static/js/hyperscript.min.js"}]]])))

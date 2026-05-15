@@ -3,8 +3,6 @@
    [taoensso.timbre :as log]
    [clojure.string :as str]
    [utils.session :refer [current-user]]
-   [utils.response :as r]
-   [hiccup2.core :as h]
    [ring.middleware.anti-forgery :as af]))
 
 (defn log-user
@@ -45,6 +43,10 @@
   [& classes]
   (str/join " " (remove str/blank? classes)))
 
+;; ========================================
+;; Basic Components
+;; ========================================
+
 (defn badge
   "Badge with variant and size support.
 
@@ -64,14 +66,14 @@
   (let [[color sign]
         (case svrt
           :info
-          ["bg-blue-50/50 border-blue-500 text-blue-700" "ℹ"]
+          ["bg-blue-50 border-blue-500 text-blue-700" "ℹ"]
           :success
-          ["bg-green-50/50 border-green-500 text-green-700" "✔"]
+          ["bg-green-50 border-green-500 text-green-700" "✔"]
           :warning
-          ["bg-yellow-50/50 border-yellow-500 text-yellow-700" "⚠"]
+          ["bg-yellow-50 border-yellow-500 text-yellow-700" "⚠"]
           :danger
-          ["bg-red-50/50 border-red-500 text-red-700" "✘"]
-          ["bg-blue-50/50 border-blue-500 text-blue-700" "ℹ"])]
+          ["bg-red-50 border-red-500 text-red-700" "✘"]
+          ["bg-blue-50 border-blue-500 text-blue-700" "ℹ"])]
     [:div.border-l-4.p-4.rounded-md.mb-4.flex.items-start.gap-2
      {:class color}
      [:span.font-bold sign]
@@ -79,227 +81,29 @@
       [:h4.font-semibold tip]
       [:p content]]]))
 
-(defn showbox
-  [subject color link remark]
-  (let [out-cls "p-6 bg-white rounded-lg shadow hover:shadow-lg hover:scale-105 transition-transform"]
-    [:div {:class out-cls}
-     [:div.flex.items-start.space-x-4
-      [:div.flex-shrink-0.w-8.h-8.rounded {:class color}]
-      [:div.flex-1.text-gray-700.text-sm.border-b.border-gray-200.pb-2
-       [:div.flex.justify-between
-        [:strong subject]
-        (when link
-          [:a {:class "text-blue-500 hover:underline"
-               :href (:href link)}
-           (:txt link)])]
-       [:span remark]]]]))
-
-(defn change-page-size [req]
-  (let [referer (get-in req [:headers "referer"])
-        ps (-> (get-in req [:params "page-size"])
-               parse-long)
-        session (assoc (:session req) :page-size ps)]
-    (assoc (r/redirect referer)
-           :session session)))
-
-(defn svrt-cls
-  [severity]
-  (case severity
-    "info" "bg-blue-100 text-blue-800"
-    "success" "bg-green-500 text-white"
-    "warning" "bg-yellow-500 text-white"
-    "danger" "bg-red-500 font-bold text-white"
-    "nil"))
-
-(defn type-of
-  [v]
-  (cond (nil? v) :nil
-        (keyword? v) :class
-        (re-find #"id=$" v) :href-id
-        :else :href-self))
-
-(defn bs-to-tw
-  [cls]
-  (case cls
-    :rownum "italic font-medium text-amber-900"
-    :text-success "text-green-500"
-    :text-warning "text-yellow-500"
-    :text-danger "text-red-500 font-bold"
-    :text-primary "text-blue-500"
-    :text-info "text-cyan-500"))
-
-(defn ratio-class
-  [r]
-  (let [f (read-string r)]
-    (cond (> f 95) :text-success
-          (> f 85) :text-warning
-          :else :text-danger)))
-
-(defn severity-class
-  [s]
-  (case s
-    "critical" :text-danger
-    "warn" :text-warning
-    :text-primary))
-
-(defn online-class
-  [s]
-  (case s
-    "在线" :text-success
-    "离线" :text-danger
-    :text-primary))
-
-(defn onu-state-class
-  [s]
-  (case s
-    "working" :text-success
-    "OffLine" :text-warning
-    "LOS" :text-danger
-    "DyingGasp" :text-danger
-    :text-warning))
-
-(defn severity-show
-  [s]
-  (case s
-    "critical" "关键"
-    "warn" "重要"
-    "普通"))
-
-(defn onu-state-show
-  [s]
-  (case s
-    "working" "正常"
-    "OffLine" "离线"
-    "LOS" "光信号丢失"
-    "DyingGasp" "掉电"
-    s))
-
-(defn bool-class
-  [v t]
-  (let [b (if t v (not v))]
-    (if b :text-danger :text-success)))
-
-(defn td-class
-  [d k v]
-  (let [default "border-0 p-2"
-        cls (case v
-              :ratio (bs-to-tw (ratio-class (k d)))
-              :online (bs-to-tw (online-class (k d)))
-              :onu-state (bs-to-tw (onu-state-class (k d)))
-              :severity (bs-to-tw (severity-class (k d)))
-              :true (bs-to-tw (bool-class (k d) true))
-              :false (bs-to-tw (bool-class (k d) false))
-              :ch-cut ""
-              (bs-to-tw v))
-        show (cond
-               (boolean? (k d)) (if (k d) "是" "否")
-               (= :severity v) (severity-show (k d))
-               (= :onu-state v) (onu-state-show (k d))
-               (= :ch-cut v) (str/replace (k d) " " "")
-               :else (k d))]
-    [:td {:class (str default " " cls)} show]))
-
 (defn alert
   [req]
   (let [msg (get-in req [:flash :message])
         severity (:severity msg)
         msg (:message msg)]
     (when msg
-     (let [cls (svrt-cls severity)]
+     (let [cls (case severity
+                 "info" "bg-blue-100 text-blue-800"
+                 "success" "bg-green-500 text-white"
+                 "warning" "bg-yellow-500 text-white"
+                 "danger" "bg-red-500 font-bold text-white"
+                 "bg-blue-100 text-blue-800")]
        [:div {:id "flashMessage"
-              :class (str cls " fixed top-20 left-1/2 transform
-                      -translate-x-1/2 text-white
-                      px-4 py-2 rounded shadow-lg
-                      transition-opacity duration-300 flex
-                      items-center justify-between min-w-[250px] max-w-md")
+              :class (str cls " fixed top-20 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 flex items-center justify-between min-w-[250px] max-w-md")
               :_ "on load wait 5s then add .opacity-0"}
         [:span msg]
         [:button
          {:_ "on click add .opacity-0 to #flashMessage"
           :class "ml-4 text-white font-bold"} "x"]]))))
 
-(defn input-filter
-  []
-  [:input
-   {:class "w-full my-2 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-    :type "text"
-    :placeholder "请输入过滤信息"
-    :_ "on input show <tbody>tr/> in <table/>
-                    when its textContent.toLowerCase()
-                    contains my value.toLowerCase()"}])
-
-(defn code-page [_req title content]
-  (str
-   (h/html
-    [:html
-     [:head
-      [:meta {:charset "utf-8"}]
-      [:title title]
-      [:link {:href "/static/css/tw_out.css" :rel "stylesheet"}]
-      [:body.bg-gray-50.min-h-screen.flex.flex-col.justify-center.p-4
-       [:div.max-w-8xl.mx-auto.p-4.bg-white.rounded-lg.shadow-md
-        [:div.p-4.border-b.border-gray-200.flex.justify-between.items-center
-         [:h2.text-xl.font-semibold.text-gray-800 title]]
-        [:div.p-4
-         [:pre.bg-gray-50.p-3.border.rounded
-          [:code content]]]]]]])))
-
-(defn table-view
-  [title headers keys data]
-  (let [a-cls "text-blue-600 hover:text-blue-800 hover:underline transition-color"]
-   [:div.my-4
-    [:h1.text-2xl.font-bold.mb-6 title]
-    [:div.bg-white.rounded.shadow.overflow-hidden
-     [:table.w-full.border-collapse.border.border-gray-300
-      [:thead
-       [:tr.bg-blue-800
-        (for [h headers]
-          [:th.border.p-2.text-white.font-bold h])]]
-      [:tbody
-       (for [d data]
-         [:tr {:class "odd:bg-blue-100 hover:bg-blue-200"}
-          (for [[k v] keys]
-            (if (map? d)
-              (case (type-of v)
-                :href-id
-                [:td.border-0.p-2
-                 [:a
-                  {:href (str v (:db/id d))
-                   :class (if (contains?
-                               #{:button :button-new} k)
-                            "text-white bg-blue-600 hover:bg-blue-800 px-4 py-2 rounded"
-                            a-cls)
-                   :target (if (= :button-new k)
-                             "_blank"
-                             "")}
-                  (k d)]]
-                :href-self
-                [:td.border-0.p-2
-                 [:a {:class a-cls :href (str v (k d))}
-                  (k d)]]
-                :class
-                (td-class d k v)
-                [:td.border-0.p-2 (k d)])
-              (if v
-                [:td.border-0.p-2
-                 [:a {:class a-cls :href (str v (d (count headers)))}
-                  (d k)]]
-                [:td.border-0.p-2 (d k)])))])]]]]))
-
-(defn table-view-with-rownum
-  [title headers keys data]
-  (let [headers (into ["行号"] headers)
-        cnt (count data)
-        [keys data]
-        (if (map? (first data))
-          [(into [[:rownum :rownum]] keys)
-           (mapv #(assoc %2 :rownum (str "#" %1))
-                 (range 1 (inc cnt)) data)]
-          [(into [[0 :rownum]]
-                 (mapv #(vector % nil) (range 1 (count headers))))
-           (mapv #(into [(str "#" %1)] %2)
-                 (range 1 (inc cnt)) data)])]
-    (table-view title headers keys data)))
+;; ========================================
+;; Form Components
+;; ========================================
 
 (defn form-input
   "Form input with consistent API.
@@ -349,7 +153,7 @@
        :name name
        :id id-c
        :autocomplete autocomplete-c
-       :class (merge-classes base size-c variant-c disabled-c (when disabled "cursor-not-allowed"))
+       :class (merge-classes base size-c variant-c disabled-c)
        :placeholder placeholder
        :value value
        :required required
@@ -363,8 +167,7 @@
      [:input {:class cls :type "submit" :value v}]]))
 
 (defn form-select [{:keys [options prompt disabled size class error id name label autocomplete]
-                  :or {size :md}
-                  :as opts}]
+                  :or {size :md}}]
   (let [size-c (get {:xs "text-xs" :sm "text-sm" :md "text-base" :lg "text-lg"} size)
         base "w-full bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none pr-8"
         id-c (or id name)
@@ -427,7 +230,7 @@
      (when label
        [:label {:for id-c :class "ml-2 block text-sm text-gray-700"} label])]))
 
-(defn form-toggle [{:keys [label name id value checked disabled class]
+(defn form-toggle [{:keys [label name id value checked disabled]
                    :or {checked false}}]
   (let [disabled-c (when disabled "opacity-50 cursor-not-allowed")
         id-c (or id name)]
@@ -446,6 +249,10 @@
               disabled-c)}]]
      (when label [:span {:class "ml-3 text-sm text-gray-700"} label])]))
 
+;; ========================================
+;; Display Components
+;; ========================================
+
 (defn card [{:keys [title content footer class variant]
             :or {variant :default}}]
   (let [base "bg-white rounded-lg shadow-md overflow-hidden"
@@ -463,15 +270,34 @@
      (when footer
        [:div.p-4.border-t.border-gray-200.bg-gray-50 footer])]))
 
-(defn stat-card [{:keys [label value icon class]}]
-  (let [base "bg-white rounded-lg shadow p-6"]
+(defn stat-card [{:keys [label value icon class trend]
+                 :or {trend :neutral}}]
+  (let [base "bg-white rounded-lg shadow p-6"
+        trend-color (case trend
+                      :up "text-green-600"
+                      :down "text-red-600"
+                      :neutral "text-gray-600")
+        trend-icon (case trend
+                     :up "↑"
+                     :down "↓"
+                     nil)
+        icon-bg-color (case trend
+                        :up "bg-green-100"
+                        :down "bg-red-100"
+                        "bg-gray-100")
+        icon-color (case trend
+                     :up "text-green-600"
+                     :down "text-red-600"
+                     "text-gray-600")]
     [:div {:class (str base " " (or class ""))}
-     [:div.flex.items-center.justify-between
-      [:div
-       [:p.text-sm.text-gray-500.mb-1 label]
-       [:p.text-2xl.font-bold.text-gray-900 (str value)]]
+     [:div.flex.items-center.justify-between.mb-4
       (when icon
-        [:div {:class icon}])]]))
+        [:div {:class (str "w-12 h-12 rounded-xl flex items-center justify-center " icon-bg-color)}
+         [:span {:class (str "w-6 h-6 " icon-color)} icon]])
+      (when trend-icon
+        [:span {:class (str "text-sm font-medium " trend-color)} trend-icon])]
+     [:p.text-sm.text-gray-500.mb-1 label]
+     [:p.text-2xl.font-bold.text-gray-900 (str value)]]))
 
 (defn breadcrumb [{:keys [items class]}]
   [:nav {:class (str "flex items-center space-x-2 text-sm " (or class "")) :aria-label "breadcrumb"}
@@ -495,11 +321,11 @@
 (defn loading-spinner [{:keys [size label class]
                        :or {size :md}}]
   (let [size-c (case size :xs "w-4 h-4" :sm "w-6 h-6" :md "w-8 h-8" :lg "w-12 h-12" "w-8 h-8")]
-    [:div {:class (str "inline-block " size-c " " (or class "")) :role "status"}
+    [:div {:class (str "inline-flex items-center gap-2 " (or class "")) :role "status"}
      [:svg.animate-spin {:class size-c :xmlns "http://www.w3.org/2000/svg" :fill "none" :viewBox "0 0 24 24"}
       [:circle {:class "opacity-25" :cx "12" :cy "12" :r "10" :stroke "currentColor" :stroke-width "4"}]
       [:path {:class "opacity-75" :fill "currentColor" :d "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"}]]
-     (when label [:span.ml-2.text-gray-500 label])]))
+     (when label [:span.text-gray-500 label])]))
 
 (defn progress-bar [{:keys [value max-val label variant class]
                     :or {value 0 max-val 100 variant :default}}]
@@ -594,8 +420,7 @@
        (for [tab tabs]
          [:button
           {:class (if (:default tab)
-                    (str btn-cls
-                         " text-blue-500 border-blue-500")
+                    (str btn-cls " text-blue-500 border-blue-500")
                     (str btn-cls " border-transparent"))
            :data-tab (:id tab)
            :role "tab"
@@ -625,3 +450,114 @@
            :aria-hidden (if (:default page) "false" "true")}
           (:content page)])]]]))
 
+;; ========================================
+;; Dashboard Components
+;; ========================================
+
+(defn page-header [{:keys [title user show-search notification-count]
+                   :or {show-search true notification-count 0}}]
+  [:header.bg-white.border-b.border-gray-200
+   [:div.flex.items-center.justify-between.px-6.py-4
+    [:div.flex.items-center.space-x-4
+     [:h1.text-xl.font-semibold.text-gray-900 title]]
+    [:div.flex.items-center.space-x-4
+     ;; Search
+     (when show-search
+       [:div.relative.hidden.md:block
+        [:svg {:class "absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" :fill "none" :stroke "currentColor" :viewBox "0 0 24 24"}
+         [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"}]]
+        [:input
+         {:type "search"
+          :placeholder "搜索..."
+          :class "w-64 pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"}]])
+     ;; Notifications
+     [:button
+      {:class "relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"}
+      [:svg {:class "w-6 h-6" :fill "none" :stroke "currentColor" :viewBox "0 0 24 24"}
+       [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"}]]
+      (when (pos? notification-count)
+        [:span.absolute.top-1.right-1.w-2.h-2.bg-red-500.rounded-full])]
+     ;; User menu
+     (when user
+       [:div.flex.items-center.space-x-3
+        [:img {:src (:avatar user "/static/img/avatar-default.jpg")
+               :alt (:name user)
+               :class "w-8 h-8 rounded-full"}]
+        [:span.hidden.md:block.text-sm.font-medium.text-gray-700 (:name user)]
+        [:svg {:class "w-4 h-4 text-gray-400" :fill "none" :stroke "currentColor" :viewBox "0 0 24 24"}
+         [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d "M19 9l-7 7-7-7"}]]])]]])
+
+(defn user-avatar [{:keys [name src size class]
+                   :or {size :md}}]
+  (let [size-c (case size :xs "w-6 h-6" :sm "w-8 h-8" :md "w-10 h-10" :lg "w-12 h-12" "w-10 h-10")
+        fallback-bg "bg-gray-300"]
+    [:img {:src (or src "/static/img/avatar-default.jpg")
+           :alt name
+           :class (str size-c " rounded-full object-cover " fallback-bg " " (or class ""))}]))
+
+(defn welcome-banner [{:keys [title subtitle action action-text class]}]
+  [:div {:class (str "bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 text-white " (or class ""))}
+   [:div.flex.items-center.justify-between
+    [:div
+     [:h2 {:class "text-2xl font-bold mb-1"} title]
+     (when subtitle
+       [:p {:class "text-white/80"} subtitle])]
+    (when action
+      [:a {:href action
+           :class "px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-white/90 transition-colors"}
+       action-text])]])
+
+(defn activity-item [{:keys [icon icon-bg icon-color title description time class]
+                     :or {icon-bg "bg-gray-100" icon-color "text-gray-600"}}]
+  [:div {:class (str "flex items-start space-x-3 " (or class ""))}
+   [:div {:class (str "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 " icon-bg)}
+    [:span {:class (str "w-4 h-4 " icon-color)} icon]]
+   [:div.flex-1.min-w-0
+    [:p.text-sm.text-gray-900 title]
+    (when description
+      [:p.text-xs.text-gray-500 description])
+    (when time
+      [:p.text-xs.text-gray-400.mt-1 time])]])
+
+(defn activity-feed [{:keys [items class]}]
+  [:div {:class (str "divide-y divide-gray-100 " (or class ""))}
+   (for [item items]
+     (activity-item item))])
+
+(defn quick-action [{:keys [href icon label class]}]
+  [:a {:href (or href "#")
+       :class (str "flex flex-col items-center p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors " (or class ""))}
+   [:div {:class "w-12 h-12 rounded-full flex items-center justify-center mb-3 bg-blue-100"}
+    [:span {:class "w-6 h-6 text-blue-600"} icon]]
+   [:span.text-sm.font-medium.text-gray-900 label]])
+
+(defn stats-icon [{:keys [icon color class]
+                  :or {color :blue}}]
+  (let [color-c (case color
+                  :blue "bg-blue-100 text-blue-600"
+                  :purple "bg-purple-100 text-purple-600"
+                  :green "bg-green-100 text-green-600"
+                  :orange "bg-orange-100 text-orange-600"
+                  :red "bg-red-100 text-red-600"
+                  "bg-gray-100 text-gray-600")]
+    [:div {:class (str "w-12 h-12 rounded-xl flex items-center justify-center " color-c " " (or class ""))}
+     [:span {:class "w-6 h-6"} icon]]))
+
+(defn dropdown-menu [{:keys [items class]}]
+  [:div {:class (str "absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 " (or class ""))
+         :_ "on click outside remove me"}
+   (for [item items]
+     [:a {:href (:href item "#")
+         :class (str "block px-4 py-2 text-sm " (if (= (:variant item) :danger) "text-red-600" "text-gray-700") " hover:bg-gray-100")}
+      (:label item)])])
+
+(defn notification-badge [{:keys [count class]}]
+  (when (pos? count)
+    [:span {:class (str "absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs font-medium text-white bg-red-500 rounded-full " (or class ""))}
+     (if (> count 99) "99+" count)]))
+
+(defn page-title [{:keys [title subtitle class]}]
+  [:div {:class (str "mb-6 " (or class ""))}
+   [:h1 {:class "text-2xl md:text-3xl font-bold text-gray-900"} title]
+   (when subtitle
+     [:p {:class "mt-1 text-gray-500"} subtitle])])

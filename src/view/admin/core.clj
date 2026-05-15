@@ -5,7 +5,7 @@
    [selmer.parser :refer [render-file]]
    [common :refer [env Tpl-root]]
    [utils.session :refer [current-user]]
-   [view.core :as c :refer [log-user type-of td-class]]
+   [view.core :as c :refer [log-user]]
    [database.user :as user]
    [view.admin.user :as usradmin]))
 
@@ -49,13 +49,100 @@
    [:user/name nil]
    [:privs nil]])
 
+(defn type-of
+  [v]
+  (cond (nil? v) :nil
+        (keyword? v) :class
+        (re-find #"id=$" v) :href-id
+        :else :href-self))
+
+(defn bs-to-tw
+  [cls]
+  (case cls
+    :rownum "italic font-medium text-amber-900"
+    :text-success "text-green-500"
+    :text-warning "text-yellow-500"
+    :text-danger "text-red-500 font-bold"
+    :text-primary "text-blue-500"
+    :text-info "text-cyan-500"))
+(defn ratio-class
+  [r]
+  (let [f (read-string r)]
+    (cond (> f 95) :text-success
+          (> f 85) :text-warning
+          :else :text-danger)))
+
+(defn severity-class
+  [s]
+  (case s
+    "critical" :text-danger
+    "warn" :text-warning
+    :text-primary))
+
+(defn online-class
+  [s]
+  (case s
+    "在线" :text-success
+    "离线" :text-danger
+    :text-primary))
+
+(defn onu-state-class
+  [s]
+  (case s
+    "working" :text-success
+    "OffLine" :text-warning
+    "LOS" :text-danger
+    "DyingGasp" :text-danger
+    :text-warning))
+
+(defn severity-show
+  [s]
+  (case s
+    "critical" "关键"
+    "warn" "重要"
+    "普通"))
+
+(defn onu-state-show
+  [s]
+  (case s
+    "working" "正常"
+    "OffLine" "离线"
+    "LOS" "光信号丢失"
+    "DyingGasp" "掉电"
+    s))
+
+(defn bool-class
+  [v t]
+  (let [b (if t v (not v))]
+    (if b :text-danger :text-success)))
+
+(defn td-class
+  [d k v]
+  (let [default "border-0 p-2"
+        cls (case v
+              :ratio (bs-to-tw (ratio-class (k d)))
+              :online (bs-to-tw (online-class (k d)))
+              :onu-state (bs-to-tw (onu-state-class (k d)))
+              :severity (bs-to-tw (severity-class (k d)))
+              :true (bs-to-tw (bool-class (k d) true))
+              :false (bs-to-tw (bool-class (k d) false))
+              :ch-cut ""
+              (bs-to-tw v))
+        show (cond
+               (boolean? (k d)) (if (k d) "是" "否")
+               (= :severity v) (severity-show (k d))
+               (= :onu-state v) (onu-state-show (k d))
+               (= :ch-cut v) (str/replace (k d) " " "")
+               :else (k d))]
+    [:td {:class (str default " " cls)} show]))
+
 (defn render
   [m]
   (render-file (str Tpl-root "/page_main.tpl") m))
 
 (defn del-style
   [t id]
-  (let [disable-cls "bg-gray-400 cursor-not-allowed"
+  (let [_disable-cls "bg-gray-400 cursor-not-allowed"
         enable-cls "bg-red-500"]
     (case t
       :usr (let [u (user/the-user id)]

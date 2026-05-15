@@ -15,30 +15,30 @@
           old-ts (- now (* 20 60 1000))
           recent-ts now
           attempts {:ip1 {:count 1 :ts old-ts}
-                    :ip2 {:count 2 :ts recent-ts}}]
-      (let [result (rl/clean-expired attempts now)]
-        (is (nil? (get result :ip1)))
-        (is (some? (get result :ip2))))))
+                    :ip2 {:count 2 :ts recent-ts}}
+          result (rl/clean-expired attempts now)]
+      (is (nil? (get result :ip1)))
+      (is (some? (get result :ip2)))))
   (testing "handles empty entry map without NPE"
     (let [now (System/currentTimeMillis)
           attempts {:bad-ip {}
-                    :good-ip {:count 1 :ts (- now (* 20 60 1000))}}]
-      (let [result (rl/clean-expired attempts now)]
-        (is (nil? (get result :bad-ip)))
-        (is (nil? (get result :good-ip))))))
+                    :good-ip {:count 1 :ts (- now (* 20 60 1000))}}
+          result (rl/clean-expired attempts now)]
+      (is (nil? (get result :bad-ip)))
+      (is (nil? (get result :good-ip)))))
   (testing "handles entry with nil ts without NPE"
     (let [now (System/currentTimeMillis)
-          attempts {:bad-ip {:count 1 :ts nil}}]
-      (let [result (rl/clean-expired attempts now)]
-        (is (nil? (get result :bad-ip)))))))
+          attempts {:bad-ip {:count 1 :ts nil}}
+          result (rl/clean-expired attempts now)]
+      (is (nil? (get result :bad-ip))))))
 
 (deftest is-locked?-test
   (testing "detects locked IP"
     (let [now (System/currentTimeMillis)
-          _ (reset! rl/login-attempts {:locked-ip {:count 5 :ts now}})]
-      (let [lock-info (rl/is-locked? :locked-ip now)]
-        (is (some? lock-info))
-        (is (pos? (:remaining-secs lock-info))))))
+          _ (reset! rl/login-attempts {:locked-ip {:count 5 :ts now}})
+          lock-info (rl/is-locked? :locked-ip now)]
+      (is (some? lock-info))
+      (is (pos? (:remaining-secs lock-info)))))
   (testing "allows non-locked IP"
     (let [now (System/currentTimeMillis)
           _ (reset! rl/login-attempts {:normal-ip {:count 2 :ts now}})]

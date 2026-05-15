@@ -174,6 +174,7 @@
 
 (defn layout [req & body]
   (str
+   "<!DOCTYPE html>"
    (h/html
     [:html
      [:head

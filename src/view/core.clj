@@ -316,22 +316,39 @@
    - :value - default value
    - :class - extra CSS classes
    - :error - error message text"
-  [{:keys [type label name size variant disabled required placeholder value id error]
+  [{:keys [type label name size variant disabled required placeholder value id error autocomplete]
     :or {type "text" size :md variant :default required false}}]
   (let [size-c (get input-size-classes size)
+        autocomplete-c (or autocomplete
+                           (case type
+                             "email" "email"
+                             "password" "current-password"
+                             "tel" "tel"
+                             "url" "url"
+                             "search" "search"
+                             "username" "username"
+                             nil)
+                           (case name
+                             "username" "username"
+                             "email" "email"
+                             "password" "current-password"
+                             "tel" "tel"
+                             nil))
         variant-c (case variant
                      :error "border-red-500 focus:ring-red-500"
                      :default "border-gray-300 focus:ring-blue-500")
         base "w-full bg-white border rounded-md focus:outline-none focus:ring-2 transition"
         disabled-c (when disabled "opacity-50 cursor-not-allowed")
+        id-c (or id name)
         label-c (str "block text-sm font-medium mb-1"
                     (if (= variant :error) " text-red-600" " text-gray-700"))]
     [:div.my-2
-     (when label [:label {:for name :class label-c} label])
+     (when label [:label {:for id-c :class label-c} label])
      [:input
       {:type type
        :name name
-       :id id
+       :id id-c
+       :autocomplete autocomplete-c
        :class (merge-classes base size-c variant-c disabled-c (when disabled "cursor-not-allowed"))
        :placeholder placeholder
        :value value
@@ -346,23 +363,36 @@
     [:div.my-2
      [:input {:class cls :type "submit" :value v}]]))
 
-(defn form-select [{:keys [options prompt disabled size class error]
+(defn form-select [{:keys [options prompt disabled size class error id name label autocomplete]
                   :or {size :md}
                   :as opts}]
   (let [size-c (get {:xs "text-xs" :sm "text-sm" :md "text-base" :lg "text-lg"} size)
-        base "w-full bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none"
+        base "w-full bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none pr-8"
+        id-c (or id name)
         disabled-c (when disabled "opacity-50 cursor-not-allowed")
-        label-c "block text-sm font-medium text-gray-700 mb-1"]
+        label-c "block text-sm font-medium text-gray-700 mb-1"
+        autocomplete-c (or autocomplete
+                           (case name
+                             "role" "organization-title"
+                             "country" "country"
+                             "timezone" "timezone"
+                             nil))]
     [:div.my-2
-     (when (:label opts)
-       [:label {:for (:name opts) :class label-c} (:label opts)])
-     [:select
-      {:name (:name opts)
-       :disabled disabled
-       :class (str base " " size-c " " disabled-c " " (or class ""))}
-      (when prompt [:option {:value ""} prompt])
-      (for [[v l] options]
-        [:option {:value v} l])]
+     (when label
+       [:label {:for id-c :class label-c} label])
+     [:div.relative
+      [:select
+       {:name name
+        :id id-c
+        :disabled disabled
+        :autocomplete autocomplete-c
+        :class (str base " " size-c " " disabled-c " " (or class ""))}
+       (when prompt [:option {:value ""} prompt])
+       (for [[v l] options]
+         [:option {:value v} l])]
+      [:div.absolute.inset-y-0.right-0.flex.items-center.pr-3.pointer-events-none
+       [:svg {:class "w-4 h-4 text-gray-400" :fill "none" :stroke "currentColor" :viewBox "0 0 24 24"}
+        [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d "M19 9l-7 7-7-7"}]]]]
      (when error [:span.text-sm.text-red-600.mt-1 error])]))
 
 (defn form-checkbox [{:keys [label name id value checked disabled class]
@@ -402,18 +432,20 @@
                    :or {checked false}}]
   (let [disabled-c (when disabled "opacity-50 cursor-not-allowed")
         id-c (or id name)]
-    [:div.my-2.flex.items-center
-     [:input
-      {:type "checkbox"
-       :name name
-       :id id-c
-       :value (or value "on")
-       :checked checked
-       :disabled disabled
-       :class (str "sr-only peer " disabled-c " " (or class ""))
-       :_ "on click toggle .hidden on next .toggle-content"}]
-     (when label
-       [:label {:for id-c :class "ml-2 block text-sm text-gray-700"} label])]))
+    [:label {:for id-c :class (str "my-2 flex items-center cursor-pointer " disabled-c)}
+     [:div.relative.inline-block.w-11.h-6.flex-shrink-0
+      [:input
+       {:type "checkbox"
+        :name name
+        :id id-c
+        :value (or value "on")
+        :checked checked
+        :disabled disabled
+        :class (str "sr-only peer " disabled-c)}]
+      [:div
+       {:class (str "cursor-pointer absolute inset-0 w-full h-full bg-gray-300 rounded-full transition-colors duration-200 ease-in-out before:absolute before:content-[''] before:h-4 before:w-4 before:bg-white before:rounded-full before:left-0.5 before:top-1 before:transition-transform before:duration-200 before:ease-in-out before:translate-x-0 peer-checked:bg-blue-600 peer-checked:before:translate-x-5 "
+              disabled-c)}]]
+     (when label [:span {:class "ml-3 text-sm text-gray-700"} label])]))
 
 (defn card [{:keys [title content footer class variant]
             :or {variant :default}}]

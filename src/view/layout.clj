@@ -127,7 +127,7 @@
        ul-cls "flex flex-col lg:flex-row lg:space-x-4"
        a-cls "block py-2 hover:text-green-400 transition-colors"]
     [:nav.bg-gray-900.text-white
-     [:div.container.mx-auto.flex.flex-wrap.items-center.justify-between.p-4
+     [:div.max-w-7xl.mx-auto.flex.flex-wrap.items-center.justify-between.p-4
       [:a.text-2xl.font-bold {:href "/"} App-name]
       [:button
        {:class "block lg:hidden" :id "menu-toggle"
@@ -183,9 +183,7 @@
               :content
               "width=device-width, initial-scale=1"}]
       [:title Title]
-      [:link {:href "/static/css/tw_out.css" :rel "stylesheet"}]
-      [:link {:href "/static/css/style.css"
-              :rel "stylesheet"}]]
+      [:link {:href "/static/css/tw_out.css" :rel "stylesheet"}]]
      [:body.min-h-screen.flex.flex-col
       [:div.flex-1
        (nav-view req)
@@ -193,7 +191,7 @@
        [:div.mx-8.mt-2
         body]]
       [:footer.bg-gray-100.py-4.mt-4
-       [:div.container.mx-auto.text-center.text-gray-500.text-sm
+       [:div.max-w-7xl.mx-auto.text-center.text-gray-500.text-sm
         "© 2026 iamzmstone"]]
       [:script {:src "/static/js/htmx.min.js"}]
       [:script {:src "/static/js/hyperscript.min.js"}]]])))

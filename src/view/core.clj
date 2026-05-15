@@ -235,7 +235,7 @@
      [:head
       [:meta {:charset "utf-8"}]
       [:title title]
-      [:link {:href "/statc/css/tw_out.css" :rel "stylesheet"}]
+      [:link {:href "/static/css/tw_out.css" :rel "stylesheet"}]
       [:body.bg-gray-50.min-h-screen.flex.flex-col.justify-center.p-4
        [:div.max-w-8xl.mx-auto.p-4.bg-white.rounded-lg.shadow-md
         [:div.p-4.border-b.border-gray-200.flex.justify-between.items-center
@@ -353,8 +353,7 @@
        :placeholder placeholder
        :value value
        :required required
-       :disabled disabled
-       :aria-disabled disabled}]
+       :disabled disabled}]
      (when error [:span.text-sm.text-red-600.mt-1 error])]))
 
 (defn form-submit-btn

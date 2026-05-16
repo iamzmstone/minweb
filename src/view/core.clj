@@ -383,6 +383,15 @@
                          (if is-active "bg-blue-100 text-blue-700" "text-gray-700 hover:bg-gray-100"))}
            (:label item)]))]]))
 
+(defn sidebar-item [{:keys [href label icon active badge class]}]
+  [:a {:href (or href "#")
+       :class (str "flex items-center px-4 py-3 rounded-lg transition-colors "
+                   (if active "bg-white/10 text-white" "text-white/70 hover:bg-white/5 hover:text-white") " " (or class ""))}
+   (when icon [:svg {:class "w-5 h-5 mr-3" :fill "none" :stroke "currentColor" :viewBox "0 0 24 24"}
+               [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d icon}]])
+   [:span label]
+   (when badge [:span {:class "ml-auto px-2 py-0.5 text-xs font-medium rounded-full bg-red-500"} badge])])
+
 (defn accordion [{:keys [items class]}]
   [:div {:class (str "space-y-2 " (or class ""))}
    (for [[i item] (map-indexed vector items)]

@@ -5,8 +5,8 @@
    [view.index :as index]
    [view.admin.core :as admin]
    [view.admin.user :as usradmin]
-   [view.login :as login]
-   [view.examples :as examples]))
+   [view.dashboard :as dashboard]
+   [view.login :as login]))
 
 (defn route
   [path method response-fn]
@@ -54,5 +54,5 @@
      (http-post "/add-usr" usradmin/add-user)
      (http-get "/delete-it/:type/:id" admin/delete-it)
      (http-get "/val-uniq/:type" admin/val-uniq)
-     (http-get "/sample" examples/example-page)
+     (http-get "/dashboard" dashboard/page)
      ] %))

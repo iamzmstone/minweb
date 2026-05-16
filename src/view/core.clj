@@ -477,6 +477,8 @@
          [:path {:stroke-linecap "round" :stroke-linejoin "round" :stroke-width "2" :d "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"}]]
         [:input
          {:type "search"
+          :name "q"
+          :id "header-search"
           :placeholder "搜索..."
           :class "w-64 pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"}]])
      ;; Notifications
@@ -489,7 +491,7 @@
      ;; User menu
      (when user
        [:div.flex.items-center.space-x-3
-        [:img {:src (:avatar user "/static/img/avatar-default.jpg")
+        [:img {:src (:avatar user "/static/img/avatar-default.svg")
                :alt (:name user)
                :class "w-8 h-8 rounded-full"}]
         [:span.hidden.md:block.text-sm.font-medium.text-gray-700 (:name user)]
@@ -500,7 +502,7 @@
                    :or {size :md}}]
   (let [size-c (case size :xs "w-6 h-6" :sm "w-8 h-8" :md "w-10 h-10" :lg "w-12 h-12" "w-10 h-10")
         fallback-bg "bg-gray-300"]
-    [:img {:src (or src "/static/img/avatar-default.jpg")
+    [:img {:src (or src "/static/img/avatar-default.svg")
            :alt name
            :class (str size-c " rounded-full object-cover " fallback-bg " " (or class ""))}]))
 
@@ -570,3 +572,5 @@
    [:h1 {:class "text-2xl md:text-3xl font-bold text-gray-900"} title]
    (when subtitle
      [:p {:class "mt-1 text-gray-500"} subtitle])])
+(defn search-bar [{:keys [placeholder on-post target hx-indicator class], :or {placeholder "搜索..."}}] (let [input-cls "w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" wrapper-cls "relative hidden md:block" icon-cls "absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"] [:div {:class (str "flex items-center " (or class ""))} [:div {:class wrapper-cls} [:svg {:class icon-cls, :fill "none", :stroke "currentColor", :viewBox "0 0 24 24"} [:path {:stroke-linecap "round", :stroke-linejoin "round", :stroke-width "2", :d "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"}]] (if on-post [:input {:type "search", :name "q", :id "input-search", :placeholder placeholder, :class input-cls, :hx-post on-post, :hx-target (or target "body"), :hx-indicator (or hx-indicator "#search-spinner")}] [:input {:type "search", :name "q", :id "input-search", :placeholder placeholder, :class input-cls}])]]))
+(defn data-table [{:keys [columns rows actions empty-message class], :or {empty-message "暂无数据"}}] (let [th-cls "px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" td-cls "px-4 py-3 text-sm text-gray-900" get-val (fn [row col] (:value (get row (:key col)))) render-action-btn (fn [a] [:button {:type "button", :class "text-blue-600 hover:text-blue-800 text-sm font-medium", :on-click (:on-click a)} (:label a)]) render-row (fn [row] (list [:tr {:class "hover:bg-gray-50"} (for [c columns] [:td {:class td-cls} (get-val row c)]) (when actions [:td {:class td-cls} [:div {:class "flex items-center space-x-2"} (for [a actions] (render-action-btn a))]])]))] [:div {:class (str "overflow-hidden rounded-lg shadow " (or class ""))} [:table {:class "min-w-full divide-y divide-gray-200"} [:thead {:class "bg-gray-50"} [:tr (for [col columns] [:th {:class th-cls} (:label col)]) (when actions [:th {:class th-cls} "操作"])] (if (empty? rows) [:tbody [:tr [:td {:colspan (count columns), :class "text-center py-8 text-gray-500"} empty-message]]] [:tbody {:class "bg-white divide-y divide-gray-200"} (for [row rows] (render-row row))])]]]))

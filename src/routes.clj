@@ -6,7 +6,8 @@
    [view.admin.core :as admin]
    [view.admin.user :as usradmin]
    [view.dashboard :as dashboard]
-   [view.login :as login]))
+   [view.login :as login]
+   [view.resource :as resource]))
 
 (defn route
   [path method response-fn]
@@ -55,4 +56,5 @@
      (http-get "/delete-it/:type/:id" admin/delete-it)
      (http-get "/val-uniq/:type" admin/val-uniq)
      (http-get "/dashboard" dashboard/page)
+     (http-get "/resources" resource/page)
      ] %))

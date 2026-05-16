@@ -35,19 +35,19 @@
       [:form {:method "post" :action "/change-page-size"}
        (c/csrf-token)
        [:span.text-sm.text-gray-700 "显示"]
-       [:select {:class sel-cls}
-        {:id "sel-ps"
-         :name "page-size"
-         :onchange "this.form.submit()"}
+       [:select (merge {:class sel-cls}
+                   {:id "sel-ps"
+                    :name "page-size"
+                    :onchange "this.form.submit()"})
         (for [s sizes]
           [:option {:value s :selected (= ps s)}
            s])]]]
      [:nav.relative.z-0.inline-flex.shadow-sm.-space-x-px
       {:aria-label "Pagination"}
-      [:a {:class a-cls}
-       (if (nil? previous)
-         {:class "hidden"}
-         {:href previous})
+      [:a (merge {:class a-cls}
+                 (if (nil? previous)
+                   {:class "hidden"}
+                   {:href previous}))
        [:span.sr-only "上一页"]
        [:svg.w-4.h-r {:viewBox "0 0 20 20" :fill "currentColor"
                       :aria-hidden "true"}
@@ -56,10 +56,10 @@
                 :d "M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"}]]]
       [:span.text-blue-500.px-2.py-2.border.border-gray-300.font-semibold
        (format "%d/%d" current-page pages)]
-      [:a {:class a-cls}
-       (if (nil? next)
-         {:class "hidden"}
-         {:href next})
+      [:a (merge {:class a-cls}
+                 (if (nil? next)
+                   {:class "hidden"}
+                   {:href next}))
        [:span.sr-only "下一页"]
        [:svg.w-4.h-r {:viewBox "0 0 20 20" :fill "currentColor"
                       :aria-hidden "true"}
@@ -225,7 +225,9 @@
      (for [item items]
        (dashboard-sidebar-item item))]]])
 
-(defn dashboard-layout [req sidebar-items & body]
+(defn dashboard-layout
+  [req sidebar-items body & {:keys [header-title header-user header-search header-notifications]
+                             :or {header-search true}}]
   (str
    "<!DOCTYPE html>"
    (h/html
@@ -239,7 +241,10 @@
       [:div.flex
        (dashboard-sidebar App-name sidebar-items)
        [:div.flex-1.flex.flex-col
-        (nav-view req)
+        (c/page-header {:title (or header-title "")
+                        :user header-user
+                        :show-search header-search
+                        :notification-count (or header-notifications 0)})
         [:main.flex-1.p-6
          body]]]
       [:script {:src "/static/js/htmx.min.js"}]

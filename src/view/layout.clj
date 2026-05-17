@@ -213,7 +213,10 @@
                     (if (:active item)
                       "bg-purple-600 text-white"
                       "text-gray-300 hover:bg-gray-700 hover:text-white"))}
-    (when (:icon item) [:span (:icon item)])
+    (when (:icon item)
+      (if (keyword? (:icon item))
+        (c/icon (:icon item) {:size :sm})
+        [:span (:icon item)]))
     [:span (:label item)]]])
 
 (defn dashboard-sidebar [title items]

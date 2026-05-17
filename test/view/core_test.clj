@@ -96,7 +96,10 @@
     (let [result (c/stat-card {:label "Users" :value 123})]
       (is (vector? result))))
   (testing "renders with trend"
-    (let [result (c/stat-card {:label "Growth" :value "23%" :trend :up})]
+    (let [result (c/stat-card {:label "Growth" :value "23%" :trend :up :trend-value "+5%"})]
+      (is (vector? result))))
+  (testing "renders with icon"
+    (let [result (c/stat-card {:label "Users" :value 123 :icon (c/icon :user)})]
       (is (vector? result)))))
 
 (deftest breadcrumb-test
@@ -172,7 +175,7 @@
     (let [result (c/page-header {:title "Dashboard"})]
       (is (vector? result))))
   (testing "renders with user"
-    (let [result (c/page-header {:title "Dashboard" :user {:name "John"}})]
+    (let [result (c/page-header {:title "Dashboard" :user {:user/name "John" :user/avatar "/avatar.png"}})]
       (is (vector? result)))))
 
 (deftest welcome-banner-test
@@ -193,6 +196,27 @@
 (deftest quick-action-test
   (testing "renders quick action"
     (let [result (c/quick-action {:label "Add User" :href "/users/new"})]
+      (is (vector? result))))
+  (testing "renders with icon"
+    (let [result (c/quick-action {:label "Add User" :href "/users/new" :icon (c/icon :user)})]
+      (is (vector? result)))))
+
+(deftest icon-test
+  (testing "renders icon by name"
+    (is (vector? (c/icon :dashboard)))
+    (is (vector? (c/icon :user)))
+    (is (vector? (c/icon :search)))
+    (is (vector? (c/icon :bell))))
+  (testing "renders icon with size"
+    (is (vector? (c/icon :user {:size :sm})))
+    (is (vector? (c/icon :user {:size :lg})))))
+
+(deftest user-menu-test
+  (testing "renders user menu"
+    (let [result (c/user-menu {:user {:user/name "John" :user/avatar "/avatar.png"}})]
+      (is (vector? result))))
+  (testing "renders with default avatar when no avatar"
+    (let [result (c/user-menu {:user {:user/name "John"}})]
       (is (vector? result)))))
 
 (deftest stats-icon-test

@@ -13,4 +13,8 @@
   [handler]
   (fn [req]
     (let [resp (handler req)]
-      (update resp :headers #(merge security-headers %)))))
+      (if (map? resp)
+        (let [existing-headers (or (:headers resp) {})
+              merged-headers (merge security-headers existing-headers)]
+          (assoc resp :headers merged-headers))
+        resp))))

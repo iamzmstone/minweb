@@ -161,7 +161,7 @@
   "Form input with consistent API.
 
    Options:
-   - :type - input type (text, email, password, number, etc.)
+   - :type - input type (text, email, password, number, textarea, autocomplete, base64-upload, etc.)
    - :label - label text
    - :name - input name
    - :size - :xs, :sm, :md, :lg (default :md)
@@ -171,8 +171,11 @@
    - :placeholder - placeholder text
    - :value - default value
    - :class - extra CSS classes
-   - :error - error message text"
-  [{:keys [type label name size variant disabled required placeholder value id error autocomplete]
+   - :error - error message text
+   - :id - input id
+   - :autocomplete - autocomplete value
+   - :list - for autocomplete type, provides datalist id"
+  [{:keys [type label name size variant disabled required placeholder value id error autocomplete list]
     :or {type "text" size :md variant :default required false}}]
   (let [size-c (get input-size-classes size)
         autocomplete-c (or autocomplete
@@ -198,19 +201,51 @@
         id-c (or id name)
         label-c (str "block text-sm font-medium mb-1"
                     (if (= variant :error) " text-red-600" " text-gray-700"))]
-    [:div.my-2
-     (when label [:label {:for id-c :class label-c} label])
-     [:input
-      {:type type
-       :name name
-       :id id-c
-       :autocomplete autocomplete-c
-       :class (merge-classes base size-c variant-c disabled-c)
-       :placeholder placeholder
-       :value value
-       :required required
-       :disabled disabled}]
-     (when error [:span.text-sm.text-red-600.mt-1 error])]))
+    (cond
+      (= type "textarea")
+      [:div.my-2
+       (when label [:label {:for id-c :class label-c} label])
+       [:textarea
+        {:type type :name name :id id-c :class (merge-classes base "py-2 px-3" variant-c disabled-c)
+         :placeholder placeholder :required required :disabled disabled}
+        value]
+       (when error [:span.text-sm.text-red-600.mt-1 error])]
+
+      (= type "autocomplete")
+      [:div.my-2
+       (when label [:label {:for id-c :class label-c} label])
+       [:input
+        {:type "text" :name name :id id-c :list (str id-c "-list")
+         :class (merge-classes base size-c variant-c disabled-c)
+         :placeholder placeholder :required required :disabled disabled :autocomplete "off"}
+        value]
+       [:datalist {:id (str id-c "-list")}
+        (for [e list]
+          [:option {:value e}])]
+       (when error [:span.text-sm.text-red-600.mt-1 error])]
+
+      (= type "base64-upload")
+      [:div.my-2
+       (when label [:label {:for id-c :class label-c} label])
+       [:input.form-control {:type "file" :required required
+                             :onchange (str "base64_upload('" id-c "', this)")}]
+       [:input {:type "hidden" :name name :id id-c}]
+       (when error [:span.text-sm.text-red-600.mt-1 error])]
+
+      :else
+      [:div.my-2
+       (when label [:label {:for id-c :class label-c} label])
+       [:input
+        {:type type
+         :name name
+         :id id-c
+         :autocomplete autocomplete-c
+         :class (merge-classes base size-c variant-c disabled-c)
+         :placeholder placeholder
+         :value value
+         :required required
+         :disabled disabled}]
+       (when error [:span.text-sm.text-red-600.mt-1 error])])))
 
 (defn form-submit-btn
   [v]

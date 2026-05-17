@@ -67,35 +67,6 @@
                 :clip-rule "evenodd"
                 :d "M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"}]]]]]))
 
-(defn autocomplete-input [& {:keys [label name value list required]}]
-  [:div.mb-3
-   [:label.form-label label]
-   [:input.form-control {:type "input" :list (str name "list")
-            :name name :value value :required required
-            :autocomplete "off"}]
-   [:datalist {:id (str name "list")}
-    (map (fn [e] [:option {:value e}]) list)]])
-
-(defn form-input [& {:keys [label type name value required id]
-                     :as opts
-                     :or {required false}}]
-  (cond
-    (= type "textarea")
-    [:div.mb-3
-     [:label.form-label label]
-     [:textarea.form-control {:type type :name name :required required} value]]
-    (= type "autocomplete")
-    (autocomplete-input opts)
-    (= type "base64-upload")
-    [:div.mb-3
-     [:label.form-label label]
-     [:input.form-control {:type "file" :required required :onchange (str "base64_upload(\"" id "\", this)")}]
-     [:input {:type "hidden" :name name :id (if id id label)}]]
-    :else
-    [:div.mb-3
-     [:label.form-label label]
-     [:input.form-control {:type type :value value :name name :required required}]]))
-
 (defn search-form
   []
   (let [input-cls "bg-white rounded-l-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-500 transition text-black"
@@ -229,7 +200,7 @@
        (dashboard-sidebar-item item))]]])
 
 (defn dashboard-layout
-  [req sidebar-items body & {:keys [header-title header-user header-search header-notifications]
+  [_req sidebar-items body & {:keys [header-title header-user header-search header-notifications]
                              :or {header-search true}}]
   (str
    "<!DOCTYPE html>"

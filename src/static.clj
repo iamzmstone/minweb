@@ -23,7 +23,7 @@
    "deb"      "application/x-deb"
    "dart"     "application/dart"
    "dll"      "application/octet-stream"
-   "dmg"      "application/octet-stream"
+   "dmg"      "application/x-dmg"
    "dms"      "application/octet-stream"
    "doc"      "application/msword"
    "dvi"      "application/x-dvi"
@@ -93,20 +93,18 @@
    "xbm"      "image/x-xbitmap"
    "xls"      "application/vnd.ms-excel"
    "xml"      "text/xml"
-   "xpm"      "image/x-xpixmap"
+   "xpm"      "image/x-pixmap"
    "xwd"      "image/x-xwindowdump"
    "zip"      "application/zip"})
 
-;; https://github.com/ring-clojure/ring/blob/master/ring-core/src/ring/util/mime_type.clj
 (defn- filename-ext
   "Returns the file extension of a filename or filepath."
   [filename]
   (when-let [ext (second (re-find #"\.([^./\\]+)$" filename))]
     (str/lower-case ext)))
 
-;; https://github.com/ring-clojure/ring/blob/master/ring-core/src/ring/util/mime_type.clj
 (defn ext-mime-type
-  "Get the mimetype from the filename extension. Takes an optional map of extensions to mimetypes that overrides values in the default-mime-types map."
+  "Get the mimetype from the filename extension."
   ([filename]
    (ext-mime-type filename {}))
   ([filename mime-types]
@@ -117,15 +115,14 @@
   "Actual serving function that is used in the router"
   [req]
   (let [relative-path (str/replace-first (:uri req) "/static/" "")
-        ;; Validate path to prevent path traversal attacks
         _ (when (or (str/includes? relative-path "..")
                     (str/includes? relative-path "~")
                     (str/starts-with? relative-path "/"))
             (throw (ex-info "Invalid path" {:path relative-path :uri (:uri req)})))
         path (str "public/" relative-path)
-        full-path (fs/canonicalize (str "resources/" path))]
-    ;; Ensure canonical path is within resources/public
-    (when-not (str/starts-with? full-path (fs/canonicalize "resources/public/"))
+        full-path (str (fs/canonicalize (str "resources/" path)))
+        public-dir (str (fs/canonicalize "resources/public/"))]
+    (when-not (str/starts-with? full-path public-dir)
       (throw (ex-info "Path outside public directory" {:path path})))
-    {:headers {"Content-Type" (ext-mime-type (fs/file-name path))}
+    {:headers {"Content-Type" (ext-mime-type path)}
      :body (fs/file full-path)}))

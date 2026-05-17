@@ -17,6 +17,7 @@
                (let [resp (response-fn req)]
                  (if (string? resp)
                    {:status 200
+                    :headers {"Content-Type" "text/html; charset=utf-8"}
                     :body resp}
                    resp)))})
 

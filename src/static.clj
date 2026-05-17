@@ -116,6 +116,16 @@
 (defn serve-static
   "Actual serving function that is used in the router"
   [req]
-  (let [path (str "public/" (str/replace-first (:uri req) "/static/" ""))]
+  (let [relative-path (str/replace-first (:uri req) "/static/" "")
+        ;; Validate path to prevent path traversal attacks
+        _ (when (or (str/includes? relative-path "..")
+                    (str/includes? relative-path "~")
+                    (str/starts-with? relative-path "/"))
+            (throw (ex-info "Invalid path" {:path relative-path :uri (:uri req)})))
+        path (str "public/" relative-path)
+        full-path (fs/canonicalize (str "resources/" path))]
+    ;; Ensure canonical path is within resources/public
+    (when-not (str/starts-with? full-path (fs/canonicalize "resources/public/"))
+      (throw (ex-info "Path outside public directory" {:path path})))
     {:headers {"Content-Type" (ext-mime-type (fs/file-name path))}
-     :body (fs/file "resources" path)}))
+     :body (fs/file full-path)}))

@@ -16,7 +16,7 @@
    :response (fn [req]
                (let [resp (response-fn req)]
                  (if (string? resp)
-                   {:sttus 200
+                   {:status 200
                     :body resp}
                    resp)))})
 

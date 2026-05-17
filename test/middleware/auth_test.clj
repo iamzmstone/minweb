@@ -14,18 +14,20 @@
     (is (false? (auth/path-restricted? "/static/css/style.css")))))
 
 (deftest authorized?-test
-  (testing "admin has access to all"
-    (let [admin-user {:user/role :admin :user/email "admin@test.com"}]
+  (testing "admin has access to admin paths and base paths"
+    (let [admin-user {:user/privs [:admin] :user/email "admin@test.com"}]
       (is (true? (auth/authorized? admin-user "/admin")))
-      (is (true? (auth/authorized? admin-user "/any-path")))))
+      (is (true? (auth/authorized? admin-user "/mgmt")))
+      (is (true? (auth/authorized? admin-user "/")))
+      (is (false? (auth/authorized? admin-user "/any-path")))))
   (testing "normal user with search privilege"
-    (let [user {:user/role :normal :user/privs [:search]}]
+    (let [user {:user/privs [:search]}]
       (is (true? (auth/authorized? user "/search")))
       (is (true? (auth/authorized? user "/")))
       (is (true? (auth/authorized? user "/chpwd")))
       (is (false? (auth/authorized? user "/admin")))))
   (testing "normal user with switch privilege"
-    (let [user {:user/role :normal :user/privs [:switch]}]
+    (let [user {:user/privs [:switch]}]
       (is (true? (auth/authorized? user "/switch")))
       (is (true? (auth/authorized? user "/sw-info")))
       (is (false? (auth/authorized? user "/search"))))))

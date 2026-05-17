@@ -41,13 +41,12 @@
 
 (defn authorized?
   [user path]
-  (if (= :admin (:user/role user))
-    true
-    (let [privs (->> (:user/privs user)
-                     (reduce #(concat %1 (privileges %2))
-                             user-privs)
-                     (into #{}))]
-      (contains? privs path))))
+  (let [user-privs-keywords (:user/privs user)
+        ;; Get all paths from user's privilege keywords
+        privilege-paths (reduce #(concat %1 (get privileges %2 [])) [] user-privs-keywords)
+        ;; Combine with base user-privs (paths all users can access)
+        all-privs (into user-privs privilege-paths)]
+    (contains? all-privs path)))
 
 (defn wrap-auth
   [handler]

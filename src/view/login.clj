@@ -41,9 +41,9 @@
 (defn index [req]
   (l/layout
    req
-   [:div.max-w-md.mx-auto.p-4
-    [:div.bg-blue-100.shadow-md.rounded-lg.p-6
-     [:h1.text-2xl.font-bold.mb-6.text-center "用户登录"]
+   [:div.max-w-md.mx-auto.p-8
+    [:div.bg-white.shadow-lg.rounded-xl.border.border-gray-200.p-8
+     [:h1.text-2xl.font-bold.mb-6.text-center.text-gray-900 "用户登录"]
      [:form {:method "post" :action "/login"}
       (c/csrf-token)
       (when-let [url (get-in req [:params "url"])]
@@ -60,9 +60,9 @@
   [req]
   (l/layout
    req
-   [:div.max-w-md.mx-auto.p-4
-    [:div.bg-blue-100.shadow-md.rounded-lg.p-6
-     [:h1.text-2xl.font-bold.mb-6.text-ceter "修改密码"]
+   [:div.max-w-md.mx-auto.p-8
+    [:div.bg-white.shadow-lg.rounded-xl.border.border-gray-200.p-8
+     [:h1.text-2xl.font-bold.mb-6.text-center.text-gray-900 "修改密码"]
      [:form {:method "post" :action "/chpwd"}
       (c/csrf-token)
       (c/form-input {:type "password" :label "原密码"

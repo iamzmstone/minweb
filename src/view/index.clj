@@ -7,7 +7,7 @@
 
 (defn showbox
   [subject color link remark]
-  (let [out-cls "p-6 bg-white rounded-lg shadow hover:shadow-lg hover:scale-105 transition-transform"]
+  (let [out-cls "p-6 bg-white rounded-lg shadow hover:shadow-lg transition-transform border border-gray-200"]
     [:div {:class out-cls}
      [:div.flex.items-start.space-x-4
       [:div.flex-shrink-0.w-8.h-8.rounded {:class color}]
@@ -32,9 +32,9 @@
                  "description of topic4"]]]
     (layout
      req
-     [:div.container.mx-auto.p-4
-      [:h1.text-3xl.font-bold.mb-6 Title]
-      [:h6.text-lg.text-gray-950.font-semibold.border-b.border-gray-200.pb-2.mb-4 subtitle]
+     [:div.container.mx-auto.p-6
+      [:h1.text-3xl.font-bold.mb-6.text-gray-900 Title]
+      [:h6.text-lg.text-gray-700.font-semibold.border-b.border-gray-200.pb-2.mb-4 subtitle]
       [:div.space-y-6
        (for [t topics]
          (apply showbox t))]])))

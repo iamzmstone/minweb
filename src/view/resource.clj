@@ -60,7 +60,7 @@
         :actions action-buttons})
       (l/paginator req 1 5 "/resources")]
      :header-title "资源管理"
-     :header-user {:name "Admin"}
+     :header-user user
      :header-search true)))
 
 (defn page [req]

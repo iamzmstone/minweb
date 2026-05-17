@@ -1,6 +1,7 @@
 (ns view.dashboard
   (:require
-   [view.layout :refer [dashboard-layout]]))
+   [view.layout :refer [dashboard-layout]]
+   [utils.session :as s]))
 
 ;; Icon functions return Hiccup SVG vectors
 (defn icon-dashboard []
@@ -64,25 +65,26 @@
     [:p {:class "text-xs text-gray-400 mt-1"} time]]])
 
 (defn page [req]
-  (dashboard-layout
-   req
-   [{:href "/dashboard" :label "控制台" :icon (icon-dashboard) :active true}
-    {:href "/users" :label "用户" :icon (icon-user)}
-    {:href "/resources" :label "资源" :icon (icon-resource)}
-    {:href "/analytics" :label "数据分析" :icon (icon-analytics)}
-    {:href "/messages" :label "消息" :icon (icon-message) :badge "3"}
-    {:section "设置"}
-    {:href "/settings" :label "设置" :icon (icon-setting)}
-    {:href "/help" :label "帮助" :icon (icon-help)}]
-   [:div {:class "p-6"}
-    ;; Welcome banner
-    [:div {:class "mb-6"}
-     [:div {:class "bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 text-white"}
-      [:div {:class "flex items-center justify-between"}
-       [:div
-        [:h2 {:class "text-2xl font-bold mb-1"} "欢迎回来，John！"]
-        [:p {:class "text-white/80"} "以下是您项目今天的概况。"]]
-       [:a {:href "/users/new" :class "px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-white/90 transition-colors"} "添加用户"]]]]
+  (let [user (s/current-user req)]
+    (dashboard-layout
+     req
+     [{:href "/dashboard" :label "控制台" :icon (icon-dashboard) :active true}
+      {:href "/users" :label "用户" :icon (icon-user)}
+      {:href "/resources" :label "资源" :icon (icon-resource)}
+      {:href "/analytics" :label "数据分析" :icon (icon-analytics)}
+      {:href "/messages" :label "消息" :icon (icon-message) :badge "3"}
+      {:section "设置"}
+      {:href "/settings" :label "设置" :icon (icon-setting)}
+      {:href "/help" :label "帮助" :icon (icon-help)}]
+     [:div {:class "p-6"}
+      ;; Welcome banner
+      [:div {:class "mb-6"}
+       [:div {:class "bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 text-white"}
+        [:div {:class "flex items-center justify-between"}
+         [:div
+          [:h2 {:class "text-2xl font-bold mb-1"} (str "欢迎回来，" (:user/name user) "！")]
+          [:p {:class "text-white/80"} "以下是您项目今天的概况。"]]
+         [:a {:href "/users/new" :class "px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-white/90 transition-colors"} "添加用户"]]]]
 
     ;; Stats cards
     [:div {:class "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"}
@@ -179,4 +181,6 @@
         "月度数据分析摘要"
         "5 小时前")]]]
 
-    [:div {:id "toast" :class "fixed bottom-4 right-4 z-50"}]]))
+    [:div {:id "toast" :class "fixed bottom-4 right-4 z-50"}]]
+    :header-user user
+    :header-search true)))

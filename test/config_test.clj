@@ -10,4 +10,9 @@
   (testing "env defaults are loaded"
     (is (string? (env :app-name)))))
 
+(deftest env-override-test
+  (testing "env supports MINWEB_ prefix override"
+    (let [test-env (merge env {:minweb-test-key "test-value"})]
+      (is (= "test-value" (get test-env :minweb-test-key))))))
+
 (run-tests)

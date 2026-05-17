@@ -18,7 +18,15 @@
 (def Public-dir "resources/public")
 (def Utf8-bom "\uFEFF")
 
-(def env (load-config :file "resources/config.edn"))
+(def env
+  (let [sys-env (System/getenv)
+        minweb-env (into {}
+                        (filter (fn [[k _]]
+                                  (str/starts-with? (name k) "MINWEB_"))
+                                sys-env))]
+    (load-config
+     :file "resources/config.edn"
+     :env minweb-env)))
 
 (defn windows
   []

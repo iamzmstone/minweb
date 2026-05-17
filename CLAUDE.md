@@ -23,6 +23,9 @@ bb db-seed
 
 # Run server on custom port
 bb start-web --port 3000
+
+# Run tests
+bb test
 ```
 
 ## Architecture
@@ -32,15 +35,17 @@ bb start-web --port 3000
 Request → ruuter routing → middleware chain → view handlers → Hiccup2 HTML
 
 Middleware chain (in core.clj):
-  wrap-rate-limit → wrap-auth → wrap-anti-forgery → wrap-flash → wrap-session → wrap-multipart-params → wrap-params
+  wrap-security-headers → wrap-rate-limit → wrap-auth → wrap-anti-forgery → wrap-flash → wrap-session → wrap-multipart-params → wrap-params → wrap-not-found → wrap-error-handler
 ```
 
 ### Key Files
 - `src/core.clj` - Entry point, server startup, middleware composition
-- `src/routes.clj` - Route definitions using ruuter DSL
+- `src/routes.clj` - Route definitions using ruuter DSL, includes catch-all for 404
 - `src/database/dtlv.clj` - Datalevin operations (schema, queries, transactions)
 - `src/middleware/auth.clj` - Auth checks, privilege-based authorization
 - `src/middleware/rate_limit.clj` - Login rate limiting (per-IP attempt tracking)
+- `src/middleware/security.clj` - Security headers (X-Frame-Options, CSP, etc.)
+- `src/middleware/error.clj` - Error handling (404/500 pages)
 - `src/view/core.clj` - Reusable UI components (badge, card, form-input, stat-card, etc.)
 - `src/view/layout.clj` - Base HTML layout with navbar, pagination, dashboard
 
@@ -58,8 +63,37 @@ Sessions store the current user entity. Auth middleware checks `session/current-
 Views return Hiccup vectors which are converted to HTML strings in the layout. CSRF tokens via `view.core/csrf-token`, flash messages via `view.core/alert`.
 
 ## Configuration
-- `resources/config.edn` - App configuration (loaded via cprop)
-- `schema.edn` - Database schema definition
+
+Configuration is loaded via `cprop` with environment variable override support.
+
+### config.edn
+```clojure
+{:port 8888
+ :app-name "MyApp"
+ :title "My Application"}
+```
+
+### Environment Variable Override
+Set `MINWEB_` prefixed environment variables to override config values:
+```bash
+export MINWEB_PORT=3000
+export MINWEB_APP_NAME="Production App"
+bb start-web
+```
+
+Available override keys: `MINWEB_PORT`, `MINWEB_APP_NAME`, `MINWEB_TITLE`, etc.
+
+## Testing
+
+```bash
+# Run all tests
+bb test
+
+# Run with clj-kondo lint
+clj-kondo --lint src/
+```
+
+Test files are located in `test/` directory with namespace pattern `*-test` or `*_test.clj`.
 
 ## Clojure/Hiccup Best Practices
 

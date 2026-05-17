@@ -41,6 +41,18 @@
   [path response-fn]
   (route path :option response-fn))
 
+(defn http-all
+  [path response-fn]
+  {:path path
+   :method :all
+   :response (fn [req]
+               (let [resp (response-fn req)]
+                 (if (string? resp)
+                   {:status 200
+                    :headers {"Content-Type" "text/html; charset=utf-8"}
+                    :body resp}
+                   resp)))})
+
 (def routes
   #(ruuter/route
     [(http-get "/static/:filename*" static/serve-static)
@@ -58,4 +70,5 @@
      (http-get "/val-uniq/:type" admin/val-uniq)
      (http-get "/dashboard" dashboard/page)
      (http-get "/resources" resource/page)
+     (http-all "**" (fn [_] nil))
      ] %))

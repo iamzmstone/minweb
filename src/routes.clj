@@ -2,6 +2,7 @@
   (:require
    [ruuter.core :as ruuter]
    [static :as static]
+   [view.examples :as sample]
    [view.index :as index]
    [view.admin.core :as admin]
    [view.admin.user :as usradmin]
@@ -70,5 +71,6 @@
      (http-get "/val-uniq/:type" admin/val-uniq)
      (http-get "/dashboard" dashboard/page)
      (http-get "/resources" resource/page)
+     (http-get "/sample" sample/example-page)
      (http-all "**" (fn [_] nil))
      ] %))

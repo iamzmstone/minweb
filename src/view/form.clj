@@ -40,13 +40,13 @@
                              "tel" "tel"
                              nil))
         variant-c (case variant
-                     :error "border-red-500 focus:ring-red-500"
-                     :default "border-gray-300 focus:ring-blue-500")
+                    :error "border-red-500 focus:ring-red-500"
+                    :default "border-gray-300 focus:ring-blue-500")
         base "w-full bg-white border rounded-md focus:outline-none focus:ring-2 transition"
         disabled-c (when disabled "opacity-50 cursor-not-allowed")
         id-c (or id name)
         label-c (str "block text-sm font-medium mb-1"
-                    (if (= variant :error) " text-red-600" " text-gray-700"))]
+                     (if (= variant :error) " text-red-600" " text-gray-700"))]
     (cond
       (= type "textarea")
       [:div.my-2
@@ -100,7 +100,7 @@
      [:input {:class cls :type "submit" :value v}]]))
 
 (defn form-select [{:keys [options prompt disabled size class error id name label autocomplete]
-                  :or {size :md}}]
+                    :or {size :md}}]
   (let [size-c (get {:xs "text-xs" :sm "text-sm" :md "text-base" :lg "text-lg"} size)
         base "w-full bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none pr-8"
         id-c (or id name)
@@ -131,7 +131,7 @@
      (when error [:span.text-sm.text-red-600.mt-1 error])]))
 
 (defn form-checkbox [{:keys [label name id value checked disabled class]
-                     :or {checked false}}]
+                      :or {checked false}}]
   (let [disabled-c (when disabled "opacity-50 cursor-not-allowed")
         id-c (or id name)]
     [:div.my-2.flex.items-center
@@ -147,7 +147,7 @@
        [:label {:for id-c :class "ml-2 block text-sm text-gray-700"} label])]))
 
 (defn form-radio [{:keys [label name id value checked disabled class group]
-                  :or {checked false}}]
+                   :or {checked false}}]
   (let [disabled-c (when disabled "opacity-50 cursor-not-allowed")
         radio-name (or group name)
         id-c (or id name)]
@@ -164,7 +164,7 @@
        [:label {:for id-c :class "ml-2 block text-sm text-gray-700"} label])]))
 
 (defn form-toggle [{:keys [label name id value checked disabled]
-                   :or {checked false}}]
+                    :or {checked false}}]
   (let [disabled-c (when disabled "opacity-50 cursor-not-allowed")
         id-c (or id name)]
     [:label {:for id-c :class (str "my-2 flex items-center cursor-pointer " disabled-c)}
@@ -179,5 +179,5 @@
         :class (str "sr-only peer " disabled-c)}]
       [:div
        {:class (str "cursor-pointer absolute inset-0 w-full h-full bg-gray-300 rounded-full transition-colors duration-200 ease-in-out before:absolute before:content-[''] before:h-4 before:w-4 before:bg-white before:rounded-full before:left-0.5 before:top-1 before:transition-transform before:duration-200 before:ease-in-out before:translate-x-0 peer-checked:bg-blue-600 peer-checked:before:translate-x-5 "
-              disabled-c)}]]
+                    disabled-c)}]]
      (when label [:span {:class "ml-3 text-sm text-gray-700"} label])]))

@@ -57,7 +57,7 @@
 (defn ent-query
   [criteria]
   (let [w (map (fn [[k v]] ['?e k v])
-                    criteria)
+               criteria)
         q (->> w
                (concat '[:find (pull ?e [*])
                          :where])
@@ -116,7 +116,7 @@
 (defn del-ent
   [eid]
   (when (pos-int? eid)
-      (d/transact! Conn [[:db.fn/retractEntity eid]])))
+    (d/transact! Conn [[:db.fn/retractEntity eid]])))
 
 (defn delete-by
   [criteria]

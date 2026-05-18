@@ -37,13 +37,13 @@
                  {:key :updated :label "修改时间"}
                  {:key :owner :label "所有者"}]
         rows (mapv (fn [r]
-                    (let [badge-info (get category-badges (keyword (:category r)))]
-                      {:name {:value (:name r)}
-                       :category {:value (c/badge (:label badge-info) {:variant (:variant badge-info)})}
-                       :size {:value (:size r)}
-                       :updated {:value (:updated r)}
-                       :owner {:value (:owner r)}}))
-                  sample-resources)]
+                     (let [badge-info (get category-badges (keyword (:category r)))]
+                       {:name {:value (:name r)}
+                        :category {:value (c/badge (:label badge-info) {:variant (:variant badge-info)})}
+                        :size {:value (:size r)}
+                        :updated {:value (:updated r)}
+                        :owner {:value (:owner r)}}))
+                   sample-resources)]
     (l/dashboard-layout
      req
      sidebar-items

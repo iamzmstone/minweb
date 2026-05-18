@@ -7,7 +7,6 @@
    [utils.response :as r]
    [view.core :as c]))
 
-
 (def Title (or (env :title) "Min's web app framework"))
 (def App-name (or (env :app-name) "Minweb"))
 (def Menu
@@ -36,9 +35,9 @@
        (c/csrf-token)
        [:span.text-sm.text-gray-700 "显示"]
        [:select (merge {:class sel-cls}
-                   {:id "sel-ps"
-                    :name "page-size"
-                    :onchange "this.form.submit()"})
+                       {:id "sel-ps"
+                        :name "page-size"
+                        :onchange "this.form.submit()"})
         (for [s sizes]
           [:option {:value s :selected (= ps s)}
            s])]]]
@@ -140,8 +139,8 @@
              Menu
              (filter
               #(authorized? user (first %))))))]
-      (when user
-        (navbar menu form-search))))
+    (when user
+      (navbar menu form-search))))
 
 (defn layout [req & body]
   (str
@@ -201,7 +200,7 @@
 
 (defn dashboard-layout
   [_req sidebar-items body & {:keys [header-title header-user header-search header-notifications]
-                             :or {header-search true}}]
+                              :or {header-search true}}]
   (str
    "<!DOCTYPE html>"
    (h/html

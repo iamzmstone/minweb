@@ -11,7 +11,7 @@
 (def privileges
   {:switch #{"/switch" "/sw-info" "/vlan"}
    :pon #{"/olt" "/card" "/pon" "/onu"
-         "/onu-state" "/state-onu" "/olt-cmd"}
+          "/onu-state" "/state-onu" "/olt-cmd"}
    :project #{"/project" "/device" "/dev-state"
               "/state-his" "/export-prj"
               "/export-long-offline"}
@@ -23,14 +23,14 @@
 
 (def restricted-pages
   (into #{}
-   (concat
-    user-privs
-    (:switch privileges)
-    (:pon privileges)
-    (:project privileges)
-    (:alert privileges)
-    (:search privileges)
-    (:admin privileges))))
+        (concat
+         user-privs
+         (:switch privileges)
+         (:pon privileges)
+         (:project privileges)
+         (:alert privileges)
+         (:search privileges)
+         (:admin privileges))))
 
 (defn path-restricted?
   [path]

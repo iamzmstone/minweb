@@ -73,19 +73,19 @@
         severity (:severity msg)
         msg (:message msg)]
     (when msg
-     (let [cls (case severity
-                 "info" "bg-blue-100 text-blue-800"
-                 "success" "bg-green-500 text-white"
-                 "warning" "bg-yellow-500 text-white"
-                 "danger" "bg-red-500 font-bold text-white"
-                 "bg-blue-100 text-blue-800")]
-       [:div {:id "flashMessage"
-              :class (str cls " fixed top-20 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 flex items-center justify-between min-w-[250px] max-w-md")
-              :_ "on load wait 5s then add .opacity-0"}
-        [:span msg]
-        [:button
-         {:_ "on click add .opacity-0 to #flashMessage"
-          :class "ml-4 text-white font-bold"} "x"]]))))
+      (let [cls (case severity
+                  "info" "bg-blue-100 text-blue-800"
+                  "success" "bg-green-500 text-white"
+                  "warning" "bg-yellow-500 text-white"
+                  "danger" "bg-red-500 font-bold text-white"
+                  "bg-blue-100 text-blue-800")]
+        [:div {:id "flashMessage"
+               :class (str cls " fixed top-20 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 flex items-center justify-between min-w-[250px] max-w-md")
+               :_ "on load wait 5s then add .opacity-0"}
+         [:span msg]
+         [:button
+          {:_ "on click add .opacity-0 to #flashMessage"
+           :class "ml-4 text-white font-bold"} "x"]]))))
 
 ;; ========================================
 ;; Re-export from view.form
@@ -103,12 +103,12 @@
 ;; ========================================
 
 (defn card [{:keys [title content footer class variant]
-            :or {variant :default}}]
+             :or {variant :default}}]
   (let [base "bg-white rounded-lg shadow-md overflow-hidden"
         variant-c (case variant
-                     :default ""
-                     :bordered "border border-gray-200"
-                     :elevated "shadow-lg")
+                    :default ""
+                    :bordered "border border-gray-200"
+                    :elevated "shadow-lg")
         card-class (str base " " variant-c " " (or class ""))]
     [:div {:class card-class}
      (when title
@@ -120,7 +120,7 @@
        [:div.p-4.border-t.border-gray-200.bg-gray-50 footer])]))
 
 (defn stat-card [{:keys [label value icon class trend trend-value]
-                 :or {trend :neutral}}]
+                  :or {trend :neutral}}]
   (let [base "bg-white rounded-lg shadow p-6"
         trend-color (case trend
                       :up "text-green-600"
@@ -160,7 +160,7 @@
      (when action [:div action])]))
 
 (defn loading-spinner [{:keys [size label class]
-                       :or {size :md}}]
+                        :or {size :md}}]
   (let [size-c (case size :xs "w-4 h-4" :sm "w-6 h-6" :md "w-8 h-8" :lg "w-12 h-12" "w-8 h-8")]
     [:div {:class (str "inline-flex items-center gap-2 " (or class "")) :role "status"}
      [:svg.animate-spin {:class size-c :xmlns "http://www.w3.org/2000/svg" :fill "none" :viewBox "0 0 24 24"}
@@ -169,7 +169,7 @@
      (when label [:span.text-gray-500 label])]))
 
 (defn progress-bar [{:keys [value max-val label variant class]
-                    :or {value 0 max-val 100 variant :default}}]
+                     :or {value 0 max-val 100 variant :default}}]
   (let [pct (min 100 (max 0 (* 100 (/ value (float max-val)))))
         variant-c (case variant :default "bg-blue-600" :success "bg-green-600" :warning "bg-yellow-600" :danger "bg-red-600" "bg-blue-600")]
     [:div {:class (str "w-full " (or class ""))}
@@ -178,13 +178,13 @@
       [:div {:class (str "h-full rounded-full " variant-c) :style {:width (str pct "%")}}]]]))
 
 (defn toast [{:keys [message type class]
-             :or {type :info}}]
+              :or {type :info}}]
   (let [type-c (case type :info "bg-blue-500" :success "bg-green-500" :warning "bg-yellow-500" :danger "bg-red-500" "bg-blue-500")]
     [:div {:class (str "fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg text-white " type-c " " (or class ""))}
      message]))
 
 (defn confirm-dialog [{:keys [title message confirm-text cancel-text class]
-                        :or {confirm-text "Confirm" cancel-text "Cancel"}}]
+                       :or {confirm-text "Confirm" cancel-text "Cancel"}}]
   [:div {:class (str "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 " (or class ""))}
    [:div {:class "bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"}
     [:h3 {:class "text-lg font-semibold text-gray-900 mb-2"} title]
@@ -194,7 +194,7 @@
      [:button {:class "px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md"} confirm-text]]]])
 
 (defn grid [{:keys [cols items class]
-           :or {cols 3}}]
+             :or {cols 3}}]
   (let [col-class (case cols
                     1 "grid-cols-1"
                     2 "grid-cols-1 md:grid-cols-2"
@@ -221,7 +221,7 @@
         (let [is-active (= (:id item) active)]
           [:a {:href (:href item "#")
                :class (str "block px-3 py-2 rounded-md text-sm font-medium "
-                         (if is-active "bg-blue-100 text-blue-700" "text-gray-700 hover:bg-gray-100"))}
+                           (if is-active "bg-blue-100 text-blue-700" "text-gray-700 hover:bg-gray-100"))}
            (:label item)]))]]))
 
 (defn sidebar-item [{:keys [href label icon active badge class]}]
@@ -239,7 +239,7 @@
      (let [id (str "accordion-" i)]
        [:div {:class "border border-gray-200 rounded-lg"}
         [:button {:class "w-full px-4 py-3 text-left flex justify-between items-center hover:bg-gray-50"
-                 :_ (format "on click toggle .hidden on #%s-content" id)}
+                  :_ (format "on click toggle .hidden on #%s-content" id)}
          [:span {:class "font-medium text-gray-900"} (:title item)]
          [:span {:class "transform transition-transform"} "▾"]]
         [:div {:id (str id "-content") :class "hidden px-4 py-3 text-gray-600"}
@@ -252,7 +252,7 @@
       [:div.flex.items-center.py-1
        (when (:children node)
          [:button {:class "w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600"
-                  :_ "on click toggle .hidden on next .tree-children"} "▸"])
+                   :_ "on click toggle .hidden on next .tree-children"} "▸"])
        [:span.text-gray-700 (:label node)]]
       (when (:children node)
         [:ul {:class "tree-children hidden pl-5 border-l border-gray-200 ml-2"}
@@ -305,7 +305,7 @@
 ;; ========================================
 
 (defn page-header [{:keys [title user show-search notification-count]
-                   :or {show-search true notification-count 0}}]
+                    :or {show-search true notification-count 0}}]
   [:header.bg-white.border-b.border-gray-200
    [:div.flex.items-center.justify-between.px-6.py-4
     [:div.flex.items-center.space-x-4
@@ -332,7 +332,7 @@
        (user-menu {:user user}))]]])
 
 (defn user-avatar [{:keys [name src size class]
-                   :or {size :md}}]
+                    :or {size :md}}]
   (let [size-c (case size :xs "w-6 h-6" :sm "w-8 h-8" :md "w-10 h-10" :lg "w-12 h-12" "w-10 h-10")
         fallback-bg "bg-gray-300"]
     [:img {:src (or src "/static/img/avatar-default.svg")
@@ -352,7 +352,7 @@
        action-text])]])
 
 (defn activity-item [{:keys [icon icon-bg title description time class]
-                     :or {icon-bg "bg-gray-100"}}]
+                      :or {icon-bg "bg-gray-100"}}]
   [:div {:class (str "flex items-start space-x-3 " (or class ""))}
    [:div {:class (str "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 " icon-bg)}
     icon]
@@ -376,7 +376,7 @@
    [:span.text-sm.font-medium.text-gray-900 label]])
 
 (defn stats-icon [{:keys [icon color class]
-                  :or {color :blue}}]
+                   :or {color :blue}}]
   (let [color-c (case color
                   :blue "bg-blue-100 text-blue-600"
                   :purple "bg-purple-100 text-purple-600"
@@ -392,7 +392,7 @@
          :_ "on click outside remove me"}
    (for [item items]
      [:a {:href (:href item "#")
-         :class (str "block px-4 py-2 text-sm " (if (= (:variant item) :danger) "text-red-600" "text-gray-700") " hover:bg-gray-100")}
+          :class (str "block px-4 py-2 text-sm " (if (= (:variant item) :danger) "text-red-600" "text-gray-700") " hover:bg-gray-100")}
       (:label item)])])
 
 (defn notification-badge [{:keys [count class]}]

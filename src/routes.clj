@@ -74,5 +74,4 @@
      (http-get "/resources" resource/page)
      (http-get "/sample" sample/example-page)
      (http-get "/health" health/health-page)
-     (http-all "**" (fn [_] nil))
-     ] %))
+     (http-all "**" (fn [_] nil))] %))

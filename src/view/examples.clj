@@ -154,8 +154,8 @@
      [:div.p-4.border.border-dashed.border-gray-300.rounded.mt-2.max-w-md
       (c/tree-view {:nodes [{:label "src"
                              :children [{:label "app"}
-                                       {:label "components"}
-                                       {:label "utils"}]}
+                                        {:label "components"}
+                                        {:label "utils"}]}
                             {:label "test"
                              :children [{:label "app_test.clj"}
                                         {:label "utils_test.clj"}]}
@@ -178,6 +178,4 @@
         [:p.text-gray-600.mb-4 "Are you sure you want to proceed?"]
         [:div.flex.gap-3.justify-end
          [:button.px-4.py-2.text-gray-700.bg-gray-100.rounded-md "Cancel"]
-         [:button.px-4.py-2.text-white.bg-blue-600.rounded-md "Confirm"]]]]]]
-
-    ]))
+         [:button.px-4.py-2.text-white.bg-blue-600.rounded-md "Confirm"]]]]]]]))

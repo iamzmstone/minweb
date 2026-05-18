@@ -21,9 +21,9 @@
 (def env
   (let [sys-env (System/getenv)
         minweb-env (into {}
-                        (filter (fn [[k _]]
-                                  (str/starts-with? (name k) "MINWEB_"))
-                                sys-env))]
+                         (filter (fn [[k _]]
+                                   (str/starts-with? (name k) "MINWEB_"))
+                                 sys-env))]
     (load-config
      :file "resources/config.edn"
      :env minweb-env)))

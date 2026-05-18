@@ -172,12 +172,12 @@
           "编辑"]
          [:button.text-white.px-2.py-1.rounded.ml-2
           (let [{:keys [disabled? class confirm]} (del-style type (:db/id d))]
-           {:hx-get (str "/delete-it/" (name type) "/" (:db/id d))
-            :hx-confirm confirm
-            :disabled disabled?
-            :class class
-            :hx-target "closest tr"
-            :hx-swap "outerHTML swap:1s"})
+            {:hx-get (str "/delete-it/" (name type) "/" (:db/id d))
+             :hx-confirm confirm
+             :disabled disabled?
+             :class class
+             :hx-target "closest tr"
+             :hx-swap "outerHTML swap:1s"})
           "删除"]]])]]])
 
 (defn table-with-rownum
@@ -202,7 +202,6 @@
         user (current-user req)
         content (html [:p (str (:user/name user) ", 欢迎进入管理后台")])]
     (render {:title title :company (env :company) :menu menu :content content})))
-
 
 (defn fetch-data
   [_req type]

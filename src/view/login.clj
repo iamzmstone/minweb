@@ -1,6 +1,7 @@
 (ns view.login
   (:require
    [taoensso.timbre :as log]
+   [common :refer [valid-password?]]
    [utils.response :as r]
    [utils.session :refer [current-user]]
    [view.core :as c]
@@ -75,8 +76,8 @@
 
 (defn validate-passwd
   [npw npwc]
-  (and (>= (count npw) 6)
-       (>= (count npwc) 6)
+  (and (valid-password? npw)
+       (valid-password? npwc)
        (= npw npwc)))
 
 (defn change-passwd
@@ -99,7 +100,7 @@
            "success" "密码修改成功"))
         (r/flash-msg
          (r/redirect "/chpwd")
-         "danger" "新密码长度必须大于5,必须匹配"))
+         "danger" "密码不符合要求：至少8位，包含大小写字母、数字和特殊字符"))
       (r/flash-msg
        (r/redirect "/chpwd")
        "danger" "原密码错误"))))

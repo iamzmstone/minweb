@@ -167,4 +167,16 @@
   (testing "updates multiple keys with function"
     (is (= {:a 2 :b 3 :c 3} (c/upd-vals {:a 1 :b 2 :c 3} [:a :b] inc)))))
 
+(deftest valid-password?-test
+  (testing "validates password complexity"
+    (is (true? (c/valid-password? "Pass123!")))
+    (is (true? (c/valid-password? "Abc12345@#$")))
+    (is (false? (c/valid-password? "short1A!")))
+    (is (false? (c/valid-password? "nouppercase123!")))
+    (is (false? (c/valid-password? "NOLOWERCASE123!")))
+    (is (false? (c/valid-password? "NoDigits!!!")))
+    (is (false? (c/valid-password? "NoSpecialChar123")))
+    (is (false? (c/valid-password? "")))
+    (is (false? (c/valid-password? nil)))))
+
 (run-tests)

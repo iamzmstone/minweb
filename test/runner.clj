@@ -6,6 +6,8 @@
 (load-file "test/middleware/auth_test.clj")
 (load-file "test/middleware/rate_limit_test.clj")
 (load-file "test/middleware/error_test.clj")
+(load-file "test/middleware/session_test.clj")
+(load-file "test/middleware/request_log_test.clj")
 (load-file "test/view/core_test.clj")
 (load-file "test/view/layout_test.clj")
 (load-file "test/view/components_test.clj")

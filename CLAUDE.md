@@ -75,9 +75,14 @@ Configuration is loaded via `cprop` with environment variable override support.
 
 ### config.edn
 ```clojure
-{:port 8888
- :app-name "MyApp"
- :title "My Application"}
+{:app-name "MyApp"
+ :title "My Application"
+ :dtlv-opts "db/dtlv.db"          ;; Datalevin database path
+ :page-size 20                     ;; Pagination size
+ :session-ttl 1800                ;; Session timeout in seconds (30 min)
+ :init-email "admin@example.com"  ;; Default admin email
+ :init-name "Admin"               ;; Default admin name
+ :init-role :admin}               ;; Default admin role
 ```
 
 ### Environment Variable Override
@@ -85,6 +90,7 @@ Set `MINWEB_` prefixed environment variables to override config values:
 ```bash
 export MINWEB_PORT=3000
 export MINWEB_APP_NAME="Production App"
+export MINWEB_SESSION_TTL=3600    ;; 1 hour session timeout
 bb start-web
 ```
 

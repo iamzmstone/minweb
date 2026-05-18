@@ -50,12 +50,13 @@
    - At least one digit
    - At least one special character (!@#$%^&*()_+-=)"
   [password]
-  (when (and password (string? password) (>= (count password) 8))
-    (let [has-upper (re-find #"[A-Z]" password)
-          has-lower (re-find #"[a-z]" password)
-          has-digit (re-find #"\d" password)
-          has-special (re-find #"[!@#$%^&*()_+\-=]" password)]
-      (and has-upper has-lower has-digit has-special))))
+  (boolean
+   (when (and password (string? password) (>= (count password) 8))
+     (let [has-upper (re-find #"[A-Z]" password)
+           has-lower (re-find #"[a-z]" password)
+           has-digit (re-find #"\d" password)
+           has-special (re-find #"[!@#$%^&*()_+\-=]" password)]
+       (and has-upper has-lower has-digit has-special)))))
 
 (defn to-bj-time
   "opt can be {:format yyyy-MM-dd HH:mm:ss.SSSXXX}"

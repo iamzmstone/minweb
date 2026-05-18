@@ -12,7 +12,9 @@
       (is (contains? (:headers resp) "X-Frame-Options"))
       (is (= "DENY" (get (:headers resp) "X-Frame-Options")))
       (is (= "nosniff" (get (:headers resp) "X-Content-Type-Options")))
-      (is (= "no-cache, no-store, must-revalidate" (get (:headers resp) "Cache-Control"))))))
+      (is (= "no-cache, no-store, must-revalidate" (get (:headers resp) "Cache-Control")))
+      (is (contains? (:headers resp) "Content-Security-Policy"))
+      (is (string? (get (:headers resp) "Content-Security-Policy"))))))
 
 (deftest security-headers-preserves-existing-headers
   (testing "preserves existing Content-Type header"

@@ -171,7 +171,7 @@
   (testing "validates password complexity"
     (is (true? (c/valid-password? "Pass123!")))
     (is (true? (c/valid-password? "Abc12345@#$")))
-    (is (false? (c/valid-password? "short1A!")))
+    (is (false? (c/valid-password? "Short1!")))   ; only 7 chars - too short
     (is (false? (c/valid-password? "nouppercase123!")))
     (is (false? (c/valid-password? "NOLOWERCASE123!")))
     (is (false? (c/valid-password? "NoDigits!!!")))

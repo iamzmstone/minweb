@@ -21,6 +21,7 @@
       (is (map? (:headers resp)))
       (is (contains? (:headers resp) "X-Frame-Options"))
       (is (= "DENY" (get (:headers resp) "X-Frame-Options")))
+      (is (contains? (:headers resp) "Content-Security-Policy"))
       (is (contains? (:headers resp) "Content-Type"))
       (is (= "application/json" (get (:headers resp) "Content-Type"))))))
 

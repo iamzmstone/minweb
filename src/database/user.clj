@@ -1,7 +1,9 @@
 (ns database.user
   (:require
    [database.dtlv :as db]
-   [utils.encryption :as enc]))
+   [utils.encryption :as enc]
+   [common :refer [env rand-password]]
+   [taoensso.timbre :as log]))
 
 (defn the-user
   [u]
@@ -37,10 +39,16 @@
 
 (defn default-user
   []
-  (db/add-user {:email "zengm@189.cn"
-                :name "曾民"
-                :password "758252"
-                :role :admin}))
+  (let [email (or (:init-email env) "admin@example.com")
+        name (or (:init-name env) "Admin")
+        role (or (:init-role env) :admin)
+        password (rand-password)]
+    (db/add-user {:email email
+                  :name name
+                  :password password
+                  :role role})
+    (log/info "Created default user:" email "with password:" password)
+    {:email email :password password}))
 
 (defn exists?
   [email]

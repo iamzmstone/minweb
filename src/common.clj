@@ -36,6 +36,12 @@
   []
   (java.util.UUID/randomUUID))
 
+(defn rand-password
+  "Generate a random 12-character password"
+  []
+  (let [chars "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"]
+    (apply str (take 12 (repeatedly #(nth chars (rand-int (count chars))))))))
+
 (defn to-bj-time
   "opt can be {:format yyyy-MM-dd HH:mm:ss.SSSXXX}"
   [utc-time-str & opt]

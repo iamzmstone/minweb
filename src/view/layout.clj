@@ -129,7 +129,7 @@
          (or
           (= :admin (:user/role user))
           (contains?
-           (into #{} (:user/privileges user))
+           (into #{} (:user/privs user))
            :search))
           (search-form))
         menu

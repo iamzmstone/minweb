@@ -1,4 +1,4 @@
-;; middleware.request-log - Request logging and tracing
+;; middleware.request-log - Request logging
 
 (ns middleware.request-log
   (:require
@@ -10,24 +10,21 @@
   (str (java.util.UUID/randomUUID)))
 
 (defn wrap-request-logging
-  "Middleware that logs request details and adds a unique request ID."
+  "Middleware that adds request ID and logs request summary."
   [handler]
   (fn [req]
     (let [request-id (or (get-in req [:headers request-id-header])
                          (generate-request-id))
           start-time (System/currentTimeMillis)
           method (name (or (:request-method req) :get))
-          uri (:uri req)
-          remote-addr (get-in req [:headers "x-forwarded-for"]
-                             (get-in req [:headers "x-real-ip"]
-                                   (:remote-addr req)))]
-      (log/info "Request started:" method uri "request-id:" request-id "ip:" remote-addr)
+          uri (:uri req)]
       (try
         (let [resp (handler (assoc req :request-id request-id))
               duration (- (System/currentTimeMillis) start-time)]
-          (log/info "Request completed:" method uri "request-id:" request-id "status:" (:status resp) "duration:" duration "ms")
+          (when (> duration 100)
+            (log/warn uri method (.intValue duration) "ms"))
           (-> resp
               (assoc-in [:headers request-id-header] request-id)))
         (catch Exception e
-          (log/error "Request failed:" method uri "request-id:" request-id "error:" (.getMessage e))
+          (log/error uri method (.getMessage e))
           (throw e))))))

@@ -3,6 +3,7 @@
    [ruuter.core :as ruuter]
    [static :as static]
    [view.examples :as sample]
+   [view.health :as health]
    [view.index :as index]
    [view.admin.core :as admin]
    [view.admin.user :as usradmin]
@@ -72,5 +73,6 @@
      (http-get "/dashboard" dashboard/page)
      (http-get "/resources" resource/page)
      (http-get "/sample" sample/example-page)
+     (http-get "/health" health/health-page)
      (http-all "**" (fn [_] nil))
      ] %))

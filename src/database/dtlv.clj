@@ -17,7 +17,12 @@
 (defn db-schema
   []
   (d/update-schema
-   Conn (edn/read-string (slurp "schema.edn"))))
+   Conn (edn/read-string (slurp "schema.edn")))
+  (try
+    (require 'database.migration)
+    ((resolve 'database.migration/ensure-schema-version))
+    (catch Exception e
+      (log/info "Migration system not available:" (.getMessage e)))))
 
 (defn schema
   []

@@ -46,6 +46,8 @@ Middleware chain (in core.clj):
 - `src/middleware/rate_limit.clj` - Login rate limiting (per-IP attempt tracking)
 - `src/middleware/security.clj` - Security headers (X-Frame-Options, CSP, etc.)
 - `src/middleware/error.clj` - Error handling (404/500 pages)
+- `src/database/migration.clj` - Schema version management and migrations
+- `src/view/health.clj` - Health check endpoint (/health)
 - `src/view/core.clj` - Reusable UI components (badge, card, stat-card, etc.), re-exports from view.config, view.icons, and view.form
 - `src/view/config.clj` - Component configuration maps (badge-variant-classes, badge-size-classes, input-size-classes, merge-classes)
 - `src/view/icons.clj` - SVG icon components (icon-paths, icon, user-menu)

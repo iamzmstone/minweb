@@ -1,4 +1,9 @@
-{:user/email
+{:db.schema/version
+ {:db/doc "Schema version for migrations"
+  :db/valueType :db.type/long
+  :db/unique :db.unique/identity}
+
+ :user/email
  {:db/doc "User Email"
   :db/valueType :db.type/string
   :db/unique :db.unique/identity}

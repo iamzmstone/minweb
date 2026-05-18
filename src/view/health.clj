@@ -3,11 +3,11 @@
 (ns view.health
   (:require
    [common :refer [env]]
-   [clojure.data.json :as json]))
+   [cheshire.core :as json]))
 
 (defn health-page [_]
   {:status 200
    :headers {"Content-Type" "application/json"}
-   :body (json/write-str {:status "ok"
-                          :app-name (env :app-name)
-                          :timestamp (System/currentTimeMillis)})})
+   :body (json/generate-string {:status "ok"
+                                :app-name (env :app-name)
+                                :timestamp (System/currentTimeMillis)})})

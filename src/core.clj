@@ -10,6 +10,7 @@
    [middleware.auth :as auth]
    [middleware.rate-limit :as rate-limit]
    [middleware.security :as security]
+   [middleware.session :as session-mw]
    [middleware.error :as error]
    [taoensso.timbre :as log]
    [taoensso.timbre.appenders.core :as appenders]
@@ -47,6 +48,8 @@
                                    :token-expiry (* 60 60 24)})
             f/wrap-flash
             s/wrap-session
+            session-mw/wrap-session-create
+            session-mw/wrap-session-timeout
             mp/wrap-multipart-params
             p/wrap-params
             error/wrap-not-found

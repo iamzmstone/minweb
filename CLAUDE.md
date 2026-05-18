@@ -45,6 +45,7 @@ Middleware chain (in core.clj):
 - `src/middleware/auth.clj` - Auth checks, privilege-based authorization
 - `src/middleware/rate_limit.clj` - Login rate limiting (per-IP attempt tracking)
 - `src/middleware/security.clj` - Security headers (X-Frame-Options, CSP, etc.)
+- `src/middleware/session.clj` - Session timeout handling (default 30 min)
 - `src/middleware/error.clj` - Error handling (404/500 pages)
 - `src/database/migration.clj` - Schema version management and migrations
 - `src/view/health.clj` - Health check endpoint (/health)
@@ -62,7 +63,7 @@ Defined in `schema.edn` using Datalevin's schema format. Current entities:
 Users have a `user/role` (keyword) and `user/privs` (set of keywords). Roles define privilege sets in `middleware/auth.clj` (`:switch`, `:pon`, `:project`, `:alert`, `:search`, `:admin`).
 
 ### Session Management
-Sessions store the current user entity. Auth middleware checks `session/current-user` to authorize requests against `restricted-pages`.
+Sessions store the current user entity. Auth middleware checks `session/current-user` to authorize requests against `restricted-pages`. Sessions expire after `:session-ttl` seconds (default 1800 = 30 minutes).
 
 ### View Pattern
 Views return Hiccup vectors which are converted to HTML strings in the layout. CSRF tokens via `view.core/csrf-token`, flash messages via `view.core/alert`.

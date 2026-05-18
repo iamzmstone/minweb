@@ -35,7 +35,7 @@ bb test
 Request → ruuter routing → middleware chain → view handlers → Hiccup2 HTML
 
 Middleware chain (in core.clj):
-  wrap-security-headers → wrap-rate-limit → wrap-auth → wrap-anti-forgery → wrap-flash → wrap-session → wrap-multipart-params → wrap-params → wrap-not-found → wrap-error-handler
+  wrap-request-logging → wrap-security-headers → wrap-rate-limit → wrap-auth → wrap-anti-forgery → wrap-flash → wrap-session → wrap-session-create → wrap-session-timeout → wrap-multipart-params → wrap-params → wrap-not-found → wrap-error-handler
 ```
 
 ### Key Files
@@ -45,6 +45,7 @@ Middleware chain (in core.clj):
 - `src/middleware/auth.clj` - Auth checks, privilege-based authorization
 - `src/middleware/rate_limit.clj` - Login rate limiting (per-IP attempt tracking)
 - `src/middleware/security.clj` - Security headers (X-Frame-Options, CSP, etc.)
+- `src/middleware/request-log.clj` - Request logging and tracing (X-Request-Id)
 - `src/middleware/session.clj` - Session timeout handling (default 30 min)
 - `src/middleware/error.clj` - Error handling (404/500 pages)
 - `src/database/migration.clj` - Schema version management and migrations

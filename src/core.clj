@@ -9,6 +9,7 @@
    [ring.middleware.flash :as f]
    [middleware.auth :as auth]
    [middleware.rate-limit :as rate-limit]
+   [middleware.request-log :as req-log]
    [middleware.security :as security]
    [middleware.session :as session-mw]
    [middleware.error :as error]
@@ -41,6 +42,7 @@
           (srv/run-server
            (->
             #'ro/routes
+            req-log/wrap-request-logging
             security/wrap-security-headers
             (rate-limit/wrap-rate-limit ["/login" "/chpwd"])
             auth/wrap-auth

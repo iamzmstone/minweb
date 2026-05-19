@@ -41,8 +41,8 @@
       (try
         (let [resp (handler (assoc req :request-id request-id))
               duration (- (System/currentTimeMillis) start-time)]
-          (when (and (important-uri? uri) (> duration 100))
-            (log/warn uri method (.intValue duration) "ms"))
+          (when (and (important-uri? uri) (> duration 0))
+            (log/debug uri method (.intValue duration) "ms"))
           (-> resp
               (assoc-in [:headers request-id-header] request-id)))
         (catch Exception e

@@ -1,6 +1,6 @@
 (ns middleware.request-log-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [middleware.request-log :as req-log]))
+            [minweb.middleware.request-log :as req-log]))
 
 (deftest generate-request-id-test
   (testing "generates unique UUIDs"

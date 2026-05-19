@@ -1,6 +1,6 @@
 (ns middleware.rate-limit-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [middleware.rate-limit :as rl]))
+            [minweb.middleware.rate-limit :as rl]))
 
 (deftest get-client-ip-test
   (testing "extracts client IP from request"

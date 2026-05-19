@@ -1,6 +1,6 @@
 (ns view.login-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [view.login :as login]))
+            [minweb.view.login :as login]))
 
 (deftest validate-passwd-test
   (testing "validates password requirements"

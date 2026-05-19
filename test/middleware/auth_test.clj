@@ -1,6 +1,6 @@
 (ns middleware.auth-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [middleware.auth :as auth]))
+            [minweb.middleware.auth :as auth]))
 
 (deftest path-restricted?-test
   (testing "detects restricted paths"

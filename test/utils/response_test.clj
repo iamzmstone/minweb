@@ -1,6 +1,6 @@
 (ns utils.response-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [utils.response :as r]))
+            [minweb.utils.response :as r]))
 
 (deftest redirect-test
   (testing "creates 303 redirect response"

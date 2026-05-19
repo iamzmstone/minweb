@@ -1,6 +1,6 @@
 (ns common-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [common :as c]))
+            [minweb.common :as c]))
 
 (deftest env1-test
   (testing "returns system environment variable"

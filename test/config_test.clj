@@ -1,6 +1,6 @@
 (ns config-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [common :refer [env]]))
+            [minweb.common :refer [env]]))
 
 (deftest env-config-test
   (testing "env returns value by key"

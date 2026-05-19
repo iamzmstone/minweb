@@ -1,6 +1,6 @@
 (ns middleware.session-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [middleware.session :as session]))
+            [minweb.middleware.session :as session]))
 
 (deftest wrap-session-timeout-test
   (testing "allows fresh sessions"

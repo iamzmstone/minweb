@@ -1,6 +1,6 @@
 (ns integration.middleware-chain-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [middleware.security :as security]))
+            [minweb.middleware.security :as security]))
 
 (deftest security-headers-test
   (testing "adds security headers to response"

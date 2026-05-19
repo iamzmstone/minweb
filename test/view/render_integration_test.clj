@@ -1,8 +1,8 @@
 (ns view.render-integration-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
             [clojure.string :as str]
-            [view.layout :as l]
-            [view.core :as c]))
+            [minweb.view.layout :as l]
+            [minweb.view.core :as c]))
 
 (deftest layout-renders-complete-html-test
   (testing "layout produces complete HTML document"

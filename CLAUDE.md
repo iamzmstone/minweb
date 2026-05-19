@@ -39,35 +39,35 @@ Middleware chain (in core.clj):
 ```
 
 ### Key Files
-- `src/core.clj` - Entry point, server startup, middleware composition
-- `src/routes.clj` - Route definitions using ruuter DSL, includes catch-all for 404
-- `src/database/dtlv.clj` - Datalevin operations (schema, queries, transactions)
-- `src/middleware/auth.clj` - Auth checks, privilege-based authorization
-- `src/middleware/rate_limit.clj` - Login rate limiting (per-IP attempt tracking)
-- `src/middleware/security.clj` - Security headers (X-Frame-Options, CSP, etc.)
-- `src/middleware/request-log.clj` - Request logging and tracing (X-Request-Id)
-- `src/middleware/session.clj` - Session timeout handling (default 30 min)
-- `src/middleware/error.clj` - Error handling (404/500 pages)
-- `src/database/migration.clj` - Schema version management and migrations
-- `src/view/health.clj` - Health check endpoint (/health)
-- `src/view/core.clj` - Reusable UI components (badge, card, stat-card, etc.), re-exports from view.config, view.icons, and view.form
-- `src/view/config.clj` - Component configuration maps (badge-variant-classes, badge-size-classes, input-size-classes, merge-classes)
-- `src/view/icons.clj` - SVG icon components (icon-paths, icon, user-menu)
-- `src/view/form.clj` - Form components (form-input, form-select, form-checkbox, form-radio, form-toggle, form-submit-btn)
-- `src/view/layout.clj` - Base HTML layout with navbar, pagination, dashboard
+- `src/minweb/core.clj` - Entry point, server startup, middleware composition
+- `src/minweb/routes.clj` - Route definitions using ruuter DSL, includes catch-all for 404
+- `src/minweb/database/dtlv.clj` - Datalevin operations (schema, queries, transactions)
+- `src/minweb/middleware/auth.clj` - Auth checks, privilege-based authorization
+- `src/minweb/middleware/rate_limit.clj` - Login rate limiting (per-IP attempt tracking)
+- `src/minweb/middleware/security.clj` - Security headers (X-Frame-Options, CSP, etc.)
+- `src/minweb/middleware/request_log.clj` - Request logging and tracing (X-Request-Id)
+- `src/minweb/middleware/session.clj` - Session timeout handling (default 30 min)
+- `src/minweb/middleware/error.clj` - Error handling (404/500 pages)
+- `src/minweb/database/migration.clj` - Schema version management and migrations
+- `src/minweb/view/health.clj` - Health check endpoint (/health)
+- `src/minweb/view/core.clj` - Reusable UI components (badge, card, stat-card, etc.), re-exports from view.config, view.icons, and view.form
+- `src/minweb/view/config.clj` - Component configuration maps (badge-variant-classes, badge-size-classes, input-size-classes, merge-classes)
+- `src/minweb/view/icons.clj` - SVG icon components (icon-paths, icon, user-menu)
+- `src/minweb/view/form.clj` - Form components (form-input, form-select, form-checkbox, form-radio, form-toggle, form-submit-btn)
+- `src/minweb/view/layout.clj` - Base HTML layout with navbar, pagination, dashboard
 
 ### Database Schema
 Defined in `schema.edn` using Datalevin's schema format. Current entities:
 - `user` - email (unique), name, password, role, privs (cardinality/many)
 
 ### Authorization Model
-Users have a `user/role` (keyword) and `user/privs` (set of keywords). Roles define privilege sets in `middleware/auth.clj` (`:switch`, `:pon`, `:project`, `:alert`, `:search`, `:admin`).
+Users have a `user/role` (keyword) and `user/privs` (set of keywords). Roles define privilege sets in `minweb.middleware.auth` (`:switch`, `:pon`, `:project`, `:alert`, `:search`, `:admin`).
 
 ### Session Management
 Sessions store the current user entity. Auth middleware checks `session/current-user` to authorize requests against `restricted-pages`. Sessions expire after `:session-ttl` seconds (default 1800 = 30 minutes).
 
 ### View Pattern
-Views return Hiccup vectors which are converted to HTML strings in the layout. CSRF tokens via `view.core/csrf-token`, flash messages via `view.core/alert`.
+Views return Hiccup vectors which are converted to HTML strings in the layout. CSRF tokens via `minweb.view.core/csrf-token`, flash messages via `minweb.view.core/alert`.
 
 ## Configuration
 
@@ -103,7 +103,7 @@ Available override keys: `MINWEB_PORT`, `MINWEB_APP_NAME`, `MINWEB_TITLE`, etc.
 bb test
 
 # Run with clj-kondo lint
-clj-kondo --lint src/
+clj-kondo --lint src/minweb/
 ```
 
 Test files are located in `test/` directory with namespace pattern `*-test` or `*_test.clj`.
@@ -119,5 +119,5 @@ Test files are located in `test/` directory with namespace pattern `*-test` or `
 
 ```bash
 # 检查括号匹配
-clj-kondo --lint src/view/layout.clj
+clj-kondo --lint src/minweb/view/layout.clj
 ```

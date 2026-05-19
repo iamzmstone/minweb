@@ -1,7 +1,7 @@
 (ns integration.middleware-stack-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [middleware.security :as security]
-            [utils.response :as resp]))
+            [minweb.middleware.security :as security]
+            [minweb.utils.response :as resp]))
 
 (defn chain-handler
   "Creates a handler with security headers applied"

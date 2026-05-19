@@ -1,6 +1,6 @@
 (ns view.components-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [view.core :as c]))
+            [minweb.view.core :as c]))
 
 (deftest merge-classes-test
   (testing "joins non-blank classes"

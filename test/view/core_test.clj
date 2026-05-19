@@ -1,6 +1,6 @@
 (ns view.core-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [view.core :as c]))
+            [minweb.view.core :as c]))
 
 (deftest badge-test
   (testing "renders badge with correct variant and size"

@@ -1,7 +1,7 @@
 (ns middleware.error-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
             [clojure.string :as str]
-            [middleware.error :as error]))
+            [minweb.middleware.error :as error]))
 
 (deftest error-page-test
   (testing "error-page generates HTML with status and message"

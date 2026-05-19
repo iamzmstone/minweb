@@ -1,6 +1,6 @@
 (ns utils.encryption-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [utils.encryption :as enc]))
+            [minweb.utils.encryption :as enc]))
 
 (deftest bytes->hex-test
   (testing "converts bytes to hex"

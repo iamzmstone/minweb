@@ -19,7 +19,7 @@
                        "Do nothing")}
   start-web {:doc "Start web application"
              :depends [tailwindcss]
-             :task core/-main}
+             :task minweb.core/-main}
   db-seed {:doc "Seed data: default admin user"
-           :task database.user/default-user}
+           :task minweb.database.user/default-user}
   test {:doc "Run tests" :task (load-file "test/runner.clj")}}}

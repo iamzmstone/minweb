@@ -1,6 +1,6 @@
 (ns integration.routes-test
   (:require [clojure.test :refer [deftest is testing run-tests]]
-            [routes :as r]))
+            [minweb.routes :as r]))
 
 (deftest route-response-string-body-test
   (testing "returns proper response map with headers for string body"

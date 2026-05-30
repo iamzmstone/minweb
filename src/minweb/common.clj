@@ -9,10 +9,6 @@
    [java.time Instant ZoneId ZonedDateTime]
    [java.time.format DateTimeFormatter]))
 
-(defn env1
-  [s]
-  (System/getenv s))
-
 (def Tpl-root "template")
 (def Out-dir "out")
 (def Public-dir "resources/public")
@@ -20,10 +16,12 @@
 
 (def env
   (let [sys-env (System/getenv)
-        minweb-env (into {}
-                         (filter (fn [[k _]]
-                                   (str/starts-with? (name k) "MINWEB_"))
-                                 sys-env))]
+        minweb-env
+        (into {}
+              (filter
+               (fn [[k _]]
+                 (str/starts-with? (name k) "MINWEB_"))
+               sys-env))]
     (load-config
      :file "resources/config.edn"
      :env minweb-env)))

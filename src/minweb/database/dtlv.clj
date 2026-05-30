@@ -4,6 +4,7 @@
    [taoensso.timbre :as log]
    [minweb.utils.encryption :refer [hash-password]]
    [clojure.edn :as edn]
+   [clojure.set :refer [difference]]
    [babashka.pods :as pods]))
 
 (pods/load-pod "dtlv")
@@ -103,11 +104,14 @@
 
 (defn add-ents
   [ents]
-  (let [attrs (keys (first ents))]
-    (if (every? #(contains? (schema) %) attrs)
+  (let [attrs (keys (first ents))
+        all-attrs (schema)]
+    (if (every? #(contains? all-attrs %) attrs)
       (d/transact! Conn ents)
-      (log/warn (str "Some of attr in "
-                     attrs " hasn't installed yet")))))
+      (log/warn
+       (str "There are attrs have not installed yet:"
+            (difference (into #{} attrs) all-attrs))))))
+
 (defn del-ent-attr
   [eid attr]
   (when (pos-int? eid)

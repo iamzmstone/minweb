@@ -1,8 +1,6 @@
 (ns minweb.middleware.error
   (:require
-   [minweb.view.layout :refer [error-page]]
-   [hiccup2.core :as h]
-   [taoensso.timbre :as log]))
+   [minweb.view.layout :refer [error-page]]))
 
 (defn not-found-page []
   (error-page 404 "404" "抱歉，找不到您要访问的页面"))
@@ -27,7 +25,7 @@
   (fn [req]
     (try
       (handler req)
-      (catch Exception e
+      (catch Exception _e
         #_(log/error "Unhandled exception:" e)
         {:status 500
          :headers {"Content-Type" "text/html; charset=utf-8"}

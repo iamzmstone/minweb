@@ -222,3 +222,23 @@
          body]]]
       [:script {:src "/static/js/htmx.min.js"}]
       [:script {:src "/static/js/hyperscript.min.js"}]]])))
+
+(defn error-page [status title message]
+  (str
+   "<!DOCTYPE html>"
+   (h/html
+    [:html
+     [:head
+      [:meta {:charset "utf-8"}]
+      [:meta {:name "viewport"
+              :content "width=device-width, initial-scale=1"}]
+      [:title title]
+      [:link {:href "/static/css/tw_out.css"
+              :rel "stylesheet"}]]
+     [:body {:class "min-h-screen flex items-center justify-center bg-gray-100"}
+      [:div {:class "bg-white rounded-xl shadow-lg p-12 max-w-md w-full text-center"}
+       [:p {:class "text-7xl font-bold text-gray-900 mb-4"}
+        status]
+       [:p {:class "text-gray-500 text-lg mb-6"} message]
+       [:a {:href "/" :class "text-blue-600 hover:underline"}
+        "返回首页"]]]])))

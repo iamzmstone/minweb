@@ -2,12 +2,12 @@
   (:require
    [clojure.test :refer [deftest is testing]]
    [clojure.string :as str]
-   [minweb.middleware.error :as error]))
+   [minweb.middleware.error :as error]
+   [minweb.view.layout :refer [error-page]]))
 
 (deftest error-page-test
   (testing "error-page generates HTML with status and message"
-    (let [result (error/error-page
-                  404 "Not Found" "Page not found")]
+    (let [result (error-page 404 "Not Found" "Page not found")]
       (is (string? result))
       (is (str/includes? result "404"))
       (is (str/includes? result "Not Found"))

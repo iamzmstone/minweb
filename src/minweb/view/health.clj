@@ -8,6 +8,7 @@
 (defn health-page [_]
   {:status 200
    :headers {"Content-Type" "application/json"}
-   :body (json/generate-string {:status "ok"
-                                :app-name (env :app-name)
-                                :timestamp (System/currentTimeMillis)})})
+   :body (json/generate-string
+          {:status "ok"
+           :app-name (env :app-name)
+           :timestamp (System/currentTimeMillis)})})

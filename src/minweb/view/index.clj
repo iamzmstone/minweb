@@ -22,19 +22,24 @@
 
 (defn page [req]
   (let [subtitle "subtitle"
-        topics [["topic1" "bg-blue-500" {:href "/topic1" :txt "topic1 information"}
+        topics [["topic1" "bg-blue-500"
+                 {:href "/topic1" :txt "topic1 information"}
                  "description of topic1"]
-                ["topic2" "bg-blue-500" {:href "/topic2" :txt "topic2 information"}
+                ["topic2" "bg-blue-500"
+                 {:href "/topic2" :txt "topic2 information"}
                  "description of topic2"]
-                ["topic3" "bg-blue-500" {:href "/topic3" :txt "topic3 information"}
+                ["topic3" "bg-blue-500"
+                 {:href "/topic3" :txt "topic3 information"}
                  "description of topic3"]
-                ["topic4" "bg-blue-500" {:href "/topic4" :txt "topic4 information"}
+                ["topic4" "bg-blue-500"
+                 {:href "/topic4" :txt "topic4 information"}
                  "description of topic4"]]]
     (layout
      req
      [:div.container.mx-auto.p-6
       [:h1.text-3xl.font-bold.mb-6.text-gray-900 Title]
-      [:h6.text-lg.text-gray-700.font-semibold.border-b.border-gray-200.pb-2.mb-4 subtitle]
+      [:h6.text-lg.text-gray-700.font-semibold.border-b.border-gray-200.pb-2.mb-4
+       subtitle]
       [:div.space-y-6
        (for [t topics]
          (apply showbox t))]])))

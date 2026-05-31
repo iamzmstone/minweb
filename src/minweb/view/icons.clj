@@ -42,9 +42,13 @@
    - :user - user map with :user/name and :user/avatar
    - :class - extra CSS classes"
   [{:keys [user class]}]
-  [:div {:class (merge-classes "flex items-center space-x-3" class)}
-   [:img {:src (or (:user/avatar user) "/static/img/avatar-default.svg")
-          :alt (:user/name user)
-          :class "w-8 h-8 rounded-full"}]
-   [:span.hidden.md:block.text-sm.font-medium.text-gray-700 (:user/name user)]
+  [:div
+   {:class (merge-classes "flex items-center space-x-3" class)}
+   [:img
+    {:src (or (:user/avatar user)
+              "/static/img/avatar-default.svg")
+     :alt (:user/name user)
+     :class "w-8 h-8 rounded-full"}]
+   [:span.hidden.md:block.text-sm.font-medium.text-gray-700
+    (:user/name user)]
    (icon :chevron-down {:size :sm :class "text-gray-400"})])

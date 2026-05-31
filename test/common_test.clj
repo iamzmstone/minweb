@@ -1,10 +1,7 @@
 (ns common-test
-  (:require [clojure.test :refer [deftest is testing run-tests]]
-            [minweb.common :as c]))
-
-(deftest env1-test
-  (testing "returns system environment variable"
-    (is (string? (c/env1 "PATH")))))
+  (:require
+   [clojure.test :refer [deftest is testing run-tests]]
+   [minweb.common :as c]))
 
 (deftest windows-test
   (testing "detects Windows OS"

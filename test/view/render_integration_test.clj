@@ -1,8 +1,9 @@
 (ns view.render-integration-test
-  (:require [clojure.test :refer [deftest is testing run-tests]]
-            [clojure.string :as str]
-            [minweb.view.layout :as l]
-            [minweb.view.core :as c]))
+  (:require
+   [clojure.test :refer [deftest is testing]]
+   [clojure.string :as str]
+   [minweb.view.layout :as l]
+   [minweb.view.core :as c]))
 
 (deftest layout-renders-complete-html-test
   (testing "layout produces complete HTML document"
@@ -75,5 +76,3 @@
   (testing "card renders with footer"
     (let [result (c/card {:title "Title" :content "Content" :footer "Footer"})]
       (is (vector? result)))))
-
-(run-tests)

@@ -22,4 +22,4 @@
              :task minweb.core/-main}
   db-seed {:doc "Seed data: default admin user"
            :task minweb.database.user/default-user}
-  test {:doc "Run tests" :task (load-file "test/runner.clj")}}}
+  test {:doc "Run tests" :task runner/run-all-tests}}}

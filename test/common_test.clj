@@ -1,6 +1,6 @@
 (ns common-test
   (:require
-   [clojure.test :refer [deftest is testing run-tests]]
+   [clojure.test :refer [deftest is testing]]
    [minweb.common :as c]))
 
 (deftest windows-test
@@ -175,5 +175,3 @@
     (is (false? (c/valid-password? "NoSpecialChar123")))
     (is (false? (c/valid-password? "")))
     (is (false? (c/valid-password? nil)))))
-
-(run-tests)

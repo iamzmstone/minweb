@@ -1,6 +1,7 @@
 (ns utils.encryption-test
-  (:require [clojure.test :refer [deftest is testing run-tests]]
-            [minweb.utils.encryption :as enc]))
+  (:require
+   [clojure.test :refer [deftest is testing]]
+   [minweb.utils.encryption :as enc]))
 
 (deftest bytes->hex-test
   (testing "converts bytes to hex"
@@ -21,5 +22,3 @@
 (deftest get-salt-test
   (testing "extracts salt"
     (is (= "5678def" (enc/get-salt "abc123$5678def")))))
-
-(run-tests)

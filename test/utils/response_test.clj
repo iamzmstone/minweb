@@ -1,6 +1,7 @@
 (ns utils.response-test
-  (:require [clojure.test :refer [deftest is testing run-tests]]
-            [minweb.utils.response :as r]))
+  (:require
+   [clojure.test :refer [deftest is testing]]
+   [minweb.utils.response :as r]))
 
 (deftest redirect-test
   (testing "creates 303 redirect response"
@@ -11,8 +12,10 @@
 (deftest flash-msg-test
   (testing "adds flash message to response"
     (let [res {:status 200 :body "test"}
-          result (r/flash-msg res "success" "Operation completed")]
-      (is (= {:message {:severity "success" :message "Operation completed"}}
+          result (r/flash-msg
+                  res "success" "Operation completed")]
+      (is (= {:message {:severity "success"
+                        :message "Operation completed"}}
              (:flash result))))))
 
 (deftest query-params->url-test
@@ -21,6 +24,5 @@
     (is (= "page=1" (r/query-params->url {"page" "1"})))
     (is (= "" (r/query-params->url {}))))
   (testing "handles edge cases"
-    (is (string? (r/query-params->url {"key" "value with spaces"})))))
-
-(run-tests)
+    (is (string? (r/query-params->url
+                  {"key" "value with spaces"})))))

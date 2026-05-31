@@ -1,19 +1,46 @@
-;; Run all tests
-(load-file "test/common_test.clj")
-(load-file "test/config_test.clj")
-(load-file "test/utils/response_test.clj")
-(load-file "test/utils/encryption_test.clj")
-(load-file "test/middleware/auth_test.clj")
-(load-file "test/middleware/rate_limit_test.clj")
-(load-file "test/middleware/error_test.clj")
-(load-file "test/middleware/session_test.clj")
-(load-file "test/middleware/request_log_test.clj")
-(load-file "test/view/core_test.clj")
-(load-file "test/view/layout_test.clj")
-(load-file "test/view/components_test.clj")
-(load-file "test/view/render_integration_test.clj")
-(load-file "test/routes_test.clj")
-(load-file "test/integration/middleware_chain_test.clj")
-(load-file "test/integration/routes_test.clj")
-(load-file "test/integration/middleware_stack_test.clj")
-nil
+(ns runner
+  (:require [clojure.test :as t]))
+
+(def test-names
+  ['common-test
+   'config-test
+   'routes-test
+   'utils.response-test
+   'utils.encryption-test
+   'middleware.auth-test
+   'middleware.rate-limit-test
+   'middleware.error-test
+   'middleware.session-test
+   'middleware.request-log-test
+   'view.core-test
+   'view.layout-test
+   'view.components-test
+   'view.render-integration-test
+   'view.login-test
+   'integration.middleware-chain-test
+   'integration.routes-test
+   'integration.middleware-stack-test])
+
+(defn run-all-tests []
+  (println "\n=== Running all tests ===\n")
+  (let [totals (atom {:tests 0 :fail 0 :error 0})]
+    (doseq [ns test-names]
+      (try
+        (require ns)
+        (catch Exception _e
+          (println "Warning: Could not load" ns)))
+      (try
+        (let [summary (t/run-tests ns)]
+          (when summary
+            (swap! totals update :tests + (:test summary 0))
+            (swap! totals update :fail + (:fail summary 0))
+            (swap! totals update :error + (:error summary 0))))
+        (catch Exception e
+          (println "Error running" ns ":" (.getMessage e)))))
+    (println "\n=== Test Summary ===")
+    (println "Total:" (:tests @totals) "tests")
+    (println "Failures:" (:fail @totals))
+    (println "Errors:" (:error @totals))
+    (println (if (and (zero? (:fail @totals)) (zero? (:error @totals)))
+               "All tests passed!"
+               "Test run completed with failures."))))

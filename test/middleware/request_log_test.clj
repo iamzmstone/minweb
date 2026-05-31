@@ -13,7 +13,8 @@
 
 (deftest wrap-request-logging-test
   (testing "adds request-id to request"
-    (let [handler (fn [req] {:status 200 :body "ok" :headers {}})
+    (let [handler (fn [_req]
+                    {:status 200 :body "ok" :headers {}})
           wrapped (req-log/wrap-request-logging handler)
           req {:request-method :get :uri "/test"}
           resp (wrapped req)]
@@ -21,7 +22,8 @@
 
   (testing "preserves existing request-id"
     (let [existing-id "existing-id-123"
-          handler (fn [req] {:status 200 :body "ok" :headers {}})
+          handler (fn [_req]
+                    {:status 200 :body "ok" :headers {}})
           wrapped (req-log/wrap-request-logging handler)
           req {:request-method :get :uri "/test" :headers {"X-Request-Id" existing-id}}
           resp (wrapped req)]

@@ -1,6 +1,7 @@
 (ns routes-test
-  (:require [clojure.test :refer [deftest is testing run-tests]]
-            [minweb.routes :as r]))
+  (:require
+   [clojure.test :refer [deftest is testing]]
+   [minweb.routes :as r]))
 
 (deftest route-test
   (testing "creates route map with path and method"
@@ -22,5 +23,3 @@
 (deftest routes-test
   (testing "routes is a function that returns a router"
     (is (fn? r/routes))))
-
-(run-tests)

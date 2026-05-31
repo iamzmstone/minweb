@@ -1,6 +1,7 @@
 (ns view.core-test
-  (:require [clojure.test :refer [deftest is testing run-tests]]
-            [minweb.view.core :as c]))
+  (:require
+   [clojure.test :refer [deftest is testing]]
+   [minweb.view.core :as c]))
 
 (deftest badge-test
   (testing "renders badge with correct variant and size"
@@ -228,5 +229,3 @@
   (testing "renders page title"
     (let [result (c/page-title {:title "Dashboard" :subtitle "Overview"})]
       (is (vector? result)))))
-
-(run-tests)

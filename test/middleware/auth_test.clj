@@ -1,6 +1,7 @@
 (ns middleware.auth-test
-  (:require [clojure.test :refer [deftest is testing run-tests]]
-            [minweb.middleware.auth :as auth]))
+  (:require
+   [clojure.test :refer [deftest is testing]]
+   [minweb.middleware.auth :as auth]))
 
 (deftest path-restricted?-test
   (testing "detects restricted paths"
@@ -11,11 +12,13 @@
     (is (true? (auth/path-restricted? "/alert"))))
   (testing "allows non-restricted paths"
     (is (false? (auth/path-restricted? "/login")))
-    (is (false? (auth/path-restricted? "/static/css/style.css")))))
+    (is (false? (auth/path-restricted?
+                 "/static/css/style.css")))))
 
 (deftest authorized?-test
   (testing "admin has access to admin paths and base paths"
-    (let [admin-user {:user/privs [:admin] :user/email "admin@test.com"}]
+    (let [admin-user {:user/privs [:admin]
+                      :user/email "admin@test.com"}]
       (is (true? (auth/authorized? admin-user "/admin")))
       (is (true? (auth/authorized? admin-user "/mgmt")))
       (is (true? (auth/authorized? admin-user "/")))
@@ -31,5 +34,3 @@
       (is (true? (auth/authorized? user "/switch")))
       (is (true? (auth/authorized? user "/sw-info")))
       (is (false? (auth/authorized? user "/search"))))))
-
-(run-tests)

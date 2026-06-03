@@ -1,5 +1,6 @@
 (ns minweb.middleware.error
   (:require
+   [taoensso.timbre :as log]
    [minweb.view.layout :refer [error-page]]))
 
 (defn not-found-page []
@@ -25,8 +26,8 @@
   (fn [req]
     (try
       (handler req)
-      (catch Exception _e
-        #_(log/error "Unhandled exception:" e)
+      (catch Exception e
+        (log/error "Unhandled exception:" e)
         {:status 500
          :headers {"Content-Type" "text/html; charset=utf-8"}
          :body (server-error-page)}))))

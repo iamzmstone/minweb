@@ -98,14 +98,14 @@
       (is (< result 3.15)))
     (is (= (c/round-to 3.001 1) 3.0))))
 
-(deftest timestamp-test
+(deftest tm-now-test
   (testing "returns current timestamp"
-    (is (pos? (c/timestamp)))
-    (is (number? (c/timestamp)))))
+    (is (pos? (c/tm-now)))
+    (is (number? (c/tm-now)))))
 
 (deftest format-time-test
   (testing "formats current time"
-    (let [result (c/format-time "yyyy-MM-dd")]
+    (let [result (c/format-time (c/tm-now) "yyyy-MM-dd")]
       (is (string? result))
       (is (= 10 (count result))))))
 

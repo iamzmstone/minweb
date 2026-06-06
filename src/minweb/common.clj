@@ -135,23 +135,25 @@
   (let [fmt (str "%.0" p "f")]
     (Float/parseFloat (format fmt (float f)))))
 
-(defn timestamp
+(defn tm-now
   []
   (System/currentTimeMillis))
 
 (defn format-time
-  [fmt]
-  (.format
-   (java.time.LocalDateTime/now)
-   (java.time.format.DateTimeFormatter/ofPattern fmt)))
+  [ts fmt]
+  (let [tm-fmt (DateTimeFormatter/ofPattern fmt)]
+    (.format
+     tm-fmt
+     (.atZone (Instant/ofEpochMilli (long ts))
+              (ZoneId/systemDefault)))))
 
 (defn current-time
   []
-  (format-time "yyyy-MM-dd HH:mm:ss"))
+  (format-time (tm-now) "yyyy-MM-dd HH:mm:ss"))
 
 (defn today
   []
-  (format-time "yyyy-MM-dd"))
+  (format-time (tm-now) "yyyy-MM-dd"))
 
 (defn duration-s
   "Get duration in second for 2 java.time vars"

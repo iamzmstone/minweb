@@ -140,12 +140,16 @@
   (System/currentTimeMillis))
 
 (defn format-time
-  [ts fmt]
+  ([ts fmt]
   (let [tm-fmt (DateTimeFormatter/ofPattern fmt)]
     (.format
      tm-fmt
      (.atZone (Instant/ofEpochMilli (long ts))
               (ZoneId/systemDefault)))))
+  ([ts]
+   (format-time ts "yyyy-MM-dd HH:mm:ss"))
+  ([]
+   (format-time (tm-now) "yyyy-MM-dd HH:mm:ss")))
 
 (defn current-time
   []

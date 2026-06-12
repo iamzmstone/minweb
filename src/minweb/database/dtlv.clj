@@ -9,7 +9,11 @@
 
 (pods/load-pod "dtlv")
 (require '[pod.huahaiy.datalevin :as d])
-(def Conn
+
+(def ^:dynamic *conn*
+  "Datalevin connection. Dynamic var — tests rebind with `binding`
+   for thread-local isolation; production code uses the root binding
+   initialized at namespace load."
   (d/get-conn (env :dtlv-opts)
               (edn/read-string (slurp "schema.edn"))
               {:closed-schema? true
@@ -18,7 +22,7 @@
 (defn db-schema
   []
   (d/update-schema
-   Conn (edn/read-string (slurp "schema.edn")))
+   *conn* (edn/read-string (slurp "schema.edn")))
   (try
     (require 'database.migration)
     ((resolve 'database.migration/ensure-schema-version))
@@ -27,25 +31,25 @@
 
 (defn schema
   []
-  (into #{:db/id} (keys (d/schema Conn))))
+  (into #{:db/id} (keys (d/schema *conn*))))
 
 (defn the-ent
   [eid]
   (when (pos-int? eid)
-    (d/pull (d/db Conn) '[*] eid)))
+    (d/pull (d/db *conn*) '[*] eid)))
 
 (defn all-ents
   [attr]
   (let [q '[:find [(pull ?e pattern) ...]
             :in $ pattern ?attr
             :where [?e ?attr]]]
-    (d/q q (d/db Conn) '[*] attr)))
+    (d/q q (d/db *conn*) '[*] attr)))
 
 (defn cnt
   [attr]
   (when-not (contains? (schema) attr)
     (log/warn (str "Attribute " attr " doesn't exists")))
-  (d/cardinality (d/db Conn) attr))
+  (d/cardinality (d/db *conn*) attr))
 
 (defn ent-by
   [k v]
@@ -53,7 +57,7 @@
             :in $ pattern ?k ?v
             :where
             [?e ?k ?v]]]
-    (d/q q (d/db Conn) '[*] k v)))
+    (d/q q (d/db *conn*) '[*] k v)))
 
 (defn ent-query
   [criteria]
@@ -63,7 +67,7 @@
                (concat '[:find (pull ?e [*])
                          :where])
                vec)]
-    (-> (d/q q (d/db Conn))
+    (-> (d/q q (d/db *conn*))
         flatten)))
 
 (defn ent-search
@@ -72,7 +76,7 @@
             :in $ ?q
             :where
             [(fulltext $ ?q {:top 100}) [[?e _ _]]]]]
-    (d/q q (d/db Conn) query)))
+    (d/q q (d/db *conn*) query)))
 
 (defn count-by
   [k v]
@@ -80,7 +84,7 @@
             :in $ ?k ?v
             :where
             [?e ?k ?v]]]
-    (ffirst (d/q q (d/db Conn) k v))))
+    (ffirst (d/q q (d/db *conn*) k v))))
 
 (defn count-query
   [criteria]
@@ -89,11 +93,11 @@
                (concat '[:find (count ?e)
                          :where])
                vec)]
-    (ffirst (-> (d/q q (d/db Conn))))))
+    (ffirst (-> (d/q q (d/db *conn*))))))
 
 (defn add-user
   [{:keys [email name password role privs]}]
-  (d/transact! Conn [{:db/id -1
+  (d/transact! *conn* [{:db/id -1
                       :user/email email
                       :user/name name
                       :user/role (or role :normal)
@@ -107,7 +111,7 @@
   (let [attrs (keys (first ents))
         all-attrs (schema)]
     (if (every? #(contains? all-attrs %) attrs)
-      (d/transact! Conn ents)
+      (d/transact! *conn* ents)
       (log/warn
        (str "There are attrs have not installed yet:"
             (difference (into #{} attrs) all-attrs))))))
@@ -115,12 +119,12 @@
 (defn del-ent-attr
   [eid attr]
   (when (pos-int? eid)
-    (d/transact! Conn [[:db.fn/retractAttribute eid attr]])))
+    (d/transact! *conn* [[:db.fn/retractAttribute eid attr]])))
 
 (defn del-ent
   [eid]
   (when (pos-int? eid)
-    (d/transact! Conn [[:db.fn/retractEntity eid]])))
+    (d/transact! *conn* [[:db.fn/retractEntity eid]])))
 
 (defn delete-by
   [criteria]
@@ -134,7 +138,7 @@
   (let [q '[:find ?e
             :in $ ?attr
             :where [?e ?attr]]
-        eids (->> (d/q q (d/db Conn) attr)
+        eids (->> (d/q q (d/db *conn*) attr)
                   (map first))]
     (doseq [eid eids]
       (del-ent eid))))
@@ -142,7 +146,7 @@
 (defn update-ent
   [eid attrs]
   (when (pos-int? eid)
-    (d/transact! Conn (mapv #(merge {:db/id eid} %) attrs))))
+    (d/transact! *conn* (mapv #(merge {:db/id eid} %) attrs))))
 
 (defn prj-devices
   [prj-eid]
@@ -156,4 +160,4 @@
             [?dev-id :device_point/name ?dev-name]
             [?dev-id :device_point/ip ?dev-ip]
             [?dev-id :device_point/type ?dev-type]]]
-    (d/q q (d/db Conn) prj-eid)))
+    (d/q q (d/db *conn*) prj-eid)))

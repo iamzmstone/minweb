@@ -1,6 +1,7 @@
 (ns minweb.common
   (:require
    [cprop.core :refer [load-config]]
+   [cprop.source :as cs]
    [clojure.java.io :as io]
    [clojure.data.csv :as csv]
    [cheshire.core :as json]
@@ -14,19 +15,30 @@
 (def Public-dir "resources/public")
 (def Utf8-bom "\uFEFF")
 
-(def env
+(def ^:private ^:const accepted-env-prefixes
+  ;; cprop \u81EA\u8EAB\u53EA\u4ECE System/getenv \u8BFB\u5168\u91CF,\u6211\u4EEC\u624B\u5DE5\u7B5B\u51FA\u8FD9\u4E9B\u524D\u7F00
+  ;; \u7136\u540E\u7528 clojure.core/merge \u6CE8\u5165(load-config \u5185\u7F6E\u7684 substitute
+  ;; \u7528 contains-in? \u5B88\u62A4,\u53EA\u8986\u76D6 config.edn \u91CC\u5DF2\u6709\u7684 key;
+  ;; :env/:override-with \u90FD\u4E0D\u80FD\u52A0\u65B0 key)
+  #{"MINWEB_" "DINGTALK_" "OSS_"})
+
+(defn- env-override-map
+  "\u4ECE System/getenv \u7B5B\u767D\u540D\u5355\u524D\u7F00,\u7ECF cprop \u7684 read-env-map + sys->map
+   \u8F6C\u6210\u9876\u5C42 keyword \u2192 value \u7684 map(load-config \u4E4B\u5916\u7684 merge \u7528)"
+  []
   (let [sys-env (System/getenv)
-        accepted-prefixes #{"MINWEB_" "DINGTALK_" "OSS_"}
-        accepted-env
-        (into {}
-              (filter
-               (fn [[k _]]
-                 (some #(str/starts-with? (name k) %)
-                       accepted-prefixes))
-               sys-env))]
-    (load-config
-     :file "resources/config.edn"
-     :env accepted-env)))
+        kept (into {}
+                   (filter
+                    (fn [[k _]]
+                      (some #(str/starts-with? (name k) %)
+                            accepted-env-prefixes))
+                    sys-env))]
+    (cs/sys->map (cs/read-env-map kept {}))))
+
+(def env
+  (merge
+   (load-config :file "resources/config.edn")
+   (env-override-map)))
 
 (defn windows
   []

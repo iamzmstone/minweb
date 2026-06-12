@@ -16,15 +16,17 @@
 
 (def env
   (let [sys-env (System/getenv)
-        minweb-env
+        accepted-prefixes #{"MINWEB_" "DINGTALK_" "OSS_"}
+        accepted-env
         (into {}
               (filter
                (fn [[k _]]
-                 (str/starts-with? (name k) "MINWEB_"))
+                 (some #(str/starts-with? (name k) %)
+                       accepted-prefixes))
                sys-env))]
     (load-config
      :file "resources/config.edn"
-     :env minweb-env)))
+     :env accepted-env)))
 
 (defn windows
   []

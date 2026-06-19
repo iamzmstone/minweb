@@ -71,7 +71,11 @@ Views return Hiccup vectors which are converted to HTML strings in the layout. C
 
 ## Configuration
 
-Configuration is loaded via `cprop` with environment variable override support.
+Configuration is loaded via `cprop` with environment variable + `.env` file override support.
+Layers(后者覆盖前者):
+1. `resources/config.edn`(基线)
+2. 项目根目录 `.env`(cprop `from-env-file` 源,缺失静默跳)
+3. 真实 `System/getenv`(只接受 `MINWEB_` / `DINGTALK_` / `OSS_` 前缀)
 
 ### config.edn
 ```clojure
@@ -86,15 +90,30 @@ Configuration is loaded via `cprop` with environment variable override support.
 ```
 
 ### Environment Variable Override
-Set `MINWEB_` prefixed environment variables to override config values:
+Set `MINWEB_` / `DINGTALK_` / `OSS_` prefixed environment variables to override config values:
 ```bash
 export MINWEB_PORT=3000
 export MINWEB_APP_NAME="Production App"
 export MINWEB_SESSION_TTL=3600    ;; 1 hour session timeout
+export DINGTALK_APP_KEY=...
+export OSS_ACCESS_KEY_ID=...
 bb start-web
 ```
 
-Available override keys: `MINWEB_PORT`, `MINWEB_APP_NAME`, `MINWEB_TITLE`, etc.
+Available override keys: `MINWEB_PORT`, `MINWEB_APP_NAME`, `MINWEB_TITLE`, `DINGTALK_APP_KEY`, `DINGTALK_APP_SECRET`, `DINGTALK_AGENT_ID`, `DINGTALK_CORP_ID`, `OSS_ACCESS_KEY_ID`, `OSS_BUCKET`, etc.
+
+### .env File
+项目根的 `.env` 文件被自动 source(Docker env 格式:`KEY=VALUE` 一行一条)。cprop 不会自动 source,这里手动加了 `cprop.source/from-env-file ".env"`。缺失或无文件静默跳过(部署环境走真实环境变量更标准)。
+
+```bash
+# .env 示例(不提交,见 .gitignore)
+DINGTALK_APP_KEY=dingxxxxxxxx
+DINGTALK_APP_SECRET=xxxxx
+OSS_BUCKET=my-bucket
+OSS_ENDPOINT=oss-cn-hangzhou.aliyuncs.com
+```
+
+注意:加新 key 后,如果 DB `config` 表已经初始化,可能需要在调用方跑一次同步命令(本项目是 `bb db-seed :force`)。
 
 ## Testing
 

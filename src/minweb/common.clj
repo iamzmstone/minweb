@@ -38,6 +38,9 @@
 (def env
   (merge
    (load-config :file "resources/config.edn")
+   ;; .env 是开发/CI 的真实凭证来源;cprop 默认不读 .env 文件,
+   ;; 手动加 from-env-file 源(cprop.source 提供;空文件不存在就静默跳)
+   (try (cs/from-env-file ".env") (catch Exception _ {}))
    (env-override-map)))
 
 (defn windows

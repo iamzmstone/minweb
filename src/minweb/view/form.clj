@@ -23,12 +23,13 @@
    - :id - input id
    - :autocomplete - autocomplete value
    - :list - for autocomplete type, provides datalist id"
-  [{:keys [type label name size variant disabled
-           required placeholder value id error
-           autocomplete list]
+  [{:as opts :keys [type label name size variant disabled
+                    required placeholder value id error
+                    autocomplete]
     :or {type "text" size :md
          variant :default required false}}]
-  (let [size-c (get input-size-classes size)
+  (let [list-options (:list opts)
+        size-c (get input-size-classes size)
         autocomplete-c
         (or autocomplete
             (case type
@@ -81,7 +82,7 @@
          :disabled disabled :autocomplete "off"}
         value]
        [:datalist {:id (str id-c "-list")}
-        (for [e list]
+        (for [e list-options]
           [:option {:value e}])]
        (when error [:span.text-sm.text-red-600.mt-1 error])]
 
@@ -117,9 +118,10 @@
      [:input {:class cls :type "submit" :value v}]]))
 
 (defn form-select
-  [{:keys [options prompt disabled size class error id name label autocomplete]
+  [{:as opts :keys [options prompt disabled size error id name label autocomplete]
     :or {size :md}}]
-  (let [size-c (get {:xs "text-xs"
+  (let [klass (:class opts)
+        size-c (get {:xs "text-xs"
                      :sm "text-sm"
                      :md "text-base"
                      :lg "text-lg"} size)
@@ -144,7 +146,7 @@
         :disabled disabled
         :autocomplete autocomplete-c
         :class (str base " " size-c " "
-                    disabled-c " " (or class ""))}
+                    disabled-c " " (or klass ""))}
        (when prompt [:option {:value ""} prompt])
        (for [[v l] options]
          [:option {:value v} l])]
@@ -158,9 +160,10 @@
      (when error [:span.text-sm.text-red-600.mt-1 error])]))
 
 (defn form-checkbox
-  [{:keys [label name id value checked disabled class]
+  [{:as opts :keys [label name id value checked disabled]
     :or {checked false}}]
-  (let [disabled-c (when disabled
+  (let [klass (:class opts)
+        disabled-c (when disabled
                      "opacity-50 cursor-not-allowed")
         id-c (or id name)]
     [:div.my-2.flex.items-center
@@ -172,16 +175,17 @@
        :checked checked
        :disabled disabled
        :class (str "h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 "
-                   disabled-c " " (or class ""))}]
+                   disabled-c " " (or klass ""))}]
      (when label
        [:label {:for id-c
                 :class "ml-2 block text-sm text-gray-700"}
         label])]))
 
 (defn form-radio
-  [{:keys [label name id value checked disabled class group]
+  [{:as opts :keys [label name id value checked disabled group]
     :or {checked false}}]
-  (let [disabled-c (when disabled
+  (let [klass (:class opts)
+        disabled-c (when disabled
                      "opacity-50 cursor-not-allowed")
         radio-name (or group name)
         id-c (or id name)]
@@ -194,7 +198,7 @@
        :checked checked
        :disabled disabled
        :class (str "h-4 w-4 rounded-full border-gray-300 text-blue-600 focus:ring-blue-500 "
-                   disabled-c " " (or class ""))}]
+                   disabled-c " " (or klass ""))}]
      (when label
        [:label {:for id-c
                 :class "ml-2 block text-sm text-gray-700"}

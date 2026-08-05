@@ -8,9 +8,9 @@
    [minweb.view.form]))
 
 (defn log-user
-  [req str]
+  [req msg]
   (let [u (current-user req)]
-    (log/info "User" (:user/name u) str)))
+    (log/info "User" (:user/name u) msg)))
 
 (defn csrf-token []
   [:input {:type "hidden"
@@ -40,7 +40,7 @@
    - :variant - :primary, :info, :success, :warning, :danger, :secondary (default :info)
    - :size - :xs, :sm, :md (default :sm)
    - :class - extra CSS classes"
-  [text {:keys [variant size class]
+  [text {:as opts :keys [variant size]
          :or {variant :info size :sm}}]
   (let [variant-c (get badge-variant-classes variant)
         size-c (get badge-size-classes size)]
@@ -48,7 +48,7 @@
      {:class
       (merge-classes
        "inline-flex items-center rounded-full font-medium"
-       variant-c size-c class)} text]))
+       variant-c size-c (:class opts))} text]))
 
 (defn callout
   [svrt tip content]
@@ -74,8 +74,8 @@
   [req]
   (let [msg (get-in req [:flash :message])
         severity (:severity msg)
-        msg (:message msg)]
-    (when msg
+        text (:message msg)]
+    (when text
       (let [cls (case severity
                   "info" "bg-blue-100 text-blue-800"
                   "success" "bg-green-500 text-white"
@@ -85,7 +85,7 @@
         [:div {:id "flashMessage"
                :class (str cls " fixed top-20 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 flex items-center justify-between min-w-[250px] max-w-md")
                :_ "on load wait 5s then add .opacity-0"}
-         [:span msg]
+         [:span text]
          [:button
           {:_ "on click add .opacity-0 to #flashMessage"
            :class "ml-4 text-white font-bold"} "x"]]))))
@@ -105,14 +105,15 @@
 ;; Display Components
 ;; ========================================
 
-(defn card [{:keys [title content footer class variant]
+(defn card [{:as opts :keys [title content footer variant]
              :or {variant :default}}]
-  (let [base "bg-white rounded-lg shadow-md overflow-hidden"
+  (let [klass (:class opts)
+        base "bg-white rounded-lg shadow-md overflow-hidden"
         variant-c (case variant
                     :default ""
                     :bordered "border border-gray-200"
                     :elevated "shadow-lg")
-        card-class (str base " " variant-c " " (or class ""))]
+        card-class (str base " " variant-c " " (or klass ""))]
     [:div {:class card-class}
      (when title
        [:div.p-4.border-b.border-gray-200
@@ -122,9 +123,11 @@
      (when footer
        [:div.p-4.border-t.border-gray-200.bg-gray-50 footer])]))
 
-(defn stat-card [{:keys [label value icon class trend trend-value]
+(defn stat-card [{:as opts :keys [label value trend trend-value]
                   :or {trend :neutral}}]
-  (let [base "bg-white rounded-lg shadow p-6"
+  (let [klass (:class opts)
+        icon-val (:icon opts)
+        base "bg-white rounded-lg shadow p-6"
         trend-color (case trend
                       :up "text-green-600"
                       :down "text-red-600"
@@ -133,52 +136,56 @@
                         :up "bg-green-100"
                         :down "bg-red-100"
                         "bg-gray-100")]
-    [:div {:class (str base " " (or class ""))}
+    [:div {:class (str base " " (or klass ""))}
      [:div.flex.items-center.justify-between.mb-4
-      (when icon
+      (when icon-val
         [:div {:class (str "w-12 h-12 rounded-xl flex items-center justify-center " icon-bg-color)}
-         icon])
+         icon-val])
       (when trend-value
         [:span {:class (str "text-sm font-medium " trend-color)} trend-value])]
      [:p.text-sm.text-gray-500.mb-1 label]
      [:p.text-2xl.font-bold.text-gray-900 (str value)]]))
 
-(defn breadcrumb [{:keys [items class]}]
-  [:nav {:class (str "flex items-center space-x-2 text-sm " (or class "")) :aria-label "breadcrumb"}
-   [:ol.flex.items-center.space-x-2
-    (for [[i item] (map-indexed vector items)]
-      [:li.flex.items-center
-       (if (= i (dec (count items)))
-         [:span.text-gray-700.font-medium
-          (if (map? item) (:label item) item)]
-         [:span.text-gray-400 "/"])
-       (when-not (= i (dec (count items)))
-         [:a {:href (if (map? item)
-                      (:href item "#") "#")
-              :class "text-blue-600 hover:underline"}
-          (if (map? item) (:label item) item)])])]])
+(defn breadcrumb [{:as opts :keys [items]}]
+  (let [klass (:class opts)]
+    [:nav {:class (str "flex items-center space-x-2 text-sm " (or klass "")) :aria-label "breadcrumb"}
+     [:ol.flex.items-center.space-x-2
+      (for [[i item] (map-indexed vector items)]
+        [:li.flex.items-center
+         (if (= i (dec (count items)))
+           [:span.text-gray-700.font-medium
+            (if (map? item) (:label item) item)]
+           [:span.text-gray-400 "/"])
+         (when-not (= i (dec (count items)))
+           [:a {:href (if (map? item)
+                        (:href item "#") "#")
+                :class "text-blue-600 hover:underline"}
+            (if (map? item) (:label item) item)])])]]))
 
 (defn empty-state
-  [{:keys [icon title description action class]}]
-  (let [base "flex flex-col items-center justify-center py-12 px-4 text-center"]
-    [:div {:class (str base " " (or class ""))}
-     (when icon [:div.text-5xl.mb-4 icon])
+  [{:as opts :keys [title description action]}]
+  (let [klass (:class opts)
+        icon-val (:icon opts)
+        base "flex flex-col items-center justify-center py-12 px-4 text-center"]
+    [:div {:class (str base " " (or klass ""))}
+     (when icon-val [:div.text-5xl.mb-4 icon-val])
      (when title
        [:h3.font-semibold.text-lg.text-gray-900.mb-2 title])
      (when description [:p.text-gray-500.mb-6 description])
      (when action [:div action])]))
 
 (defn loading-spinner
-  [{:keys [size label class]
+  [{:as opts :keys [size label]
     :or {size :md}}]
-  (let [size-c (case size
+  (let [klass (:class opts)
+        size-c (case size
                  :xs "w-4 h-4"
                  :sm "w-6 h-6"
                  :md "w-8 h-8"
                  :lg "w-12 h-12" "w-8 h-8")]
     [:div {:class
            (str "inline-flex items-center gap-2 "
-                (or class "")) :role "status"}
+                (or klass "")) :role "status"}
      [:svg.animate-spin
       {:class size-c
        :xmlns "http://www.w3.org/2000/svg"
@@ -192,23 +199,25 @@
      (when label [:span.text-gray-500 label])]))
 
 (defn progress-bar
-  [{:keys [value max-val label variant class]
+  [{:as opts :keys [value max-val label variant]
     :or {value 0 max-val 100 variant :default}}]
-  (let [pct (min 100 (max 0 (* 100 (/ value (float max-val)))))
+  (let [klass (:class opts)
+        pct (min 100 (max 0 (* 100 (/ value (float max-val)))))
         variant-c (case variant
                     :default "bg-blue-600"
                     :success "bg-green-600"
                     :warning "bg-yellow-600"
                     :danger "bg-red-600" "bg-blue-600")]
-    [:div {:class (str "w-full " (or class ""))}
+    [:div {:class (str "w-full " (or klass ""))}
      (when label [:div.text-sm.text-gray-600.mb-1 label])
      [:div.h-2.w-full.bg-gray-200.rounded-full.overflow-hidden
       [:div {:class (str "h-full rounded-full " variant-c)
              :style {:width (str pct "%")}}]]]))
 
-(defn toast [{:keys [message type class]
+(defn toast [{:as opts :keys [message type]
               :or {type :info}}]
-  (let [type-c (case type
+  (let [klass (:class opts)
+        type-c (case type
                  :info "bg-blue-500"
                  :success "bg-green-500"
                  :warning "bg-yellow-500"
@@ -216,33 +225,35 @@
     [:div
      {:class
       (str "fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg text-white "
-           type-c " " (or class ""))}
+           type-c " " (or klass ""))}
      message]))
 
 (defn confirm-dialog
-  [{:keys [title message confirm-text cancel-text class]
+  [{:as opts :keys [title message confirm-text cancel-text]
     :or {confirm-text "Confirm" cancel-text "Cancel"}}]
-  [:div
-   {:class
-    (str "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 "
-         (or class ""))}
-   [:div
-    {:class "bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"}
-    [:h3
-     {:class "text-lg font-semibold text-gray-900 mb-2"} title]
-    [:p {:class "text-gray-600 mb-6"} message]
-    [:div {:class "flex justify-end space-x-3"}
-     [:button
-      {:class "px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"}
-      cancel-text]
-     [:button
-      {:class "px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md"}
-      confirm-text]]]])
+  (let [klass (:class opts)]
+    [:div
+     {:class
+      (str "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 "
+           (or klass ""))}
+     [:div
+      {:class "bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"}
+      [:h3
+       {:class "text-lg font-semibold text-gray-900 mb-2"} title]
+      [:p {:class "text-gray-600 mb-6"} message]
+      [:div {:class "flex justify-end space-x-3"}
+       [:button
+        {:class "px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"}
+        cancel-text]
+       [:button
+        {:class "px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md"}
+        confirm-text]]]]))
 
 (defn grid
-  [{:keys [cols items class]
+  [{:as opts :keys [cols items]
     :or {cols 3}}]
-  (let [col-class
+  (let [klass (:class opts)
+        col-class
         (case cols
           1 "grid-cols-1"
           2 "grid-cols-1 md:grid-cols-2"
@@ -251,21 +262,23 @@
           (str "grid-cols-" cols))]
     [:div
      {:class (str "grid gap-4 " col-class " "
-                  (or class ""))}
+                  (or klass ""))}
      (for [item items]
        [:div item])]))
 
-(defn container [{:keys [title content class]}]
-  (let [base "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"]
-    [:div {:class (str base " " (or class ""))}
+(defn container [{:as opts :keys [title content]}]
+  (let [klass (:class opts)
+        base "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"]
+    [:div {:class (str base " " (or klass ""))}
      (when title
        [:h1 {:class "text-3xl font-bold text-gray-900 mb-6"}
         title])
      (when content [:div content])]))
 
-(defn sidebar [{:keys [title items active class]}]
-  (let [base "w-64 bg-white border-r border-gray-200 min-h-screen"]
-    [:div {:class (str base " " (or class ""))}
+(defn sidebar [{:as opts :keys [title items active]}]
+  (let [klass (:class opts)
+        base "w-64 bg-white border-r border-gray-200 min-h-screen"]
+    [:div {:class (str base " " (or klass ""))}
      (when title
        [:div {:class "p-4 border-b border-gray-200"}
         [:h2 {:class "text-lg font-semibold text-gray-800"}
@@ -280,53 +293,60 @@
            (:label item)]))]]))
 
 (defn sidebar-item
-  [{:keys [href label icon active badge class]}]
-  [:a {:href (or href "#")
-       :class (str "flex items-center px-4 py-3 rounded-lg transition-colors "
-                   (if active "bg-white/10 text-white" "text-white/70 hover:bg-white/5 hover:text-white") " " (or class ""))}
-   (when icon [:svg {:class "w-5 h-5 mr-3"
-                     :fill "none" :stroke "currentColor"
-                     :viewBox "0 0 24 24"}
-               [:path {:stroke-linecap "round"
-                       :stroke-linejoin "round"
-                       :stroke-width "2" :d icon}]])
-   [:span label]
-   (when badge
-     [:span {:class "ml-auto px-2 py-0.5 text-xs font-medium rounded-full bg-red-500"}
-      badge])])
+  [{:as opts :keys [href label]}]
+  (let [klass (:class opts)
+        icon-val (:icon opts)
+        active? (:active opts)
+        badge-label (:badge opts)
+        active-class (if active? "bg-white/10 text-white" "text-white/70 hover:bg-white/5 hover:text-white")]
+    [:a {:href (or href "#")
+         :class (str "flex items-center px-4 py-3 rounded-lg transition-colors "
+                     active-class " " (or klass ""))}
+     (when icon-val [:svg {:class "w-5 h-5 mr-3"
+                           :fill "none" :stroke "currentColor"
+                           :viewBox "0 0 24 24"}
+                     [:path {:stroke-linecap "round"
+                             :stroke-linejoin "round"
+                             :stroke-width "2" :d icon-val}]])
+     [:span label]
+     (when badge-label
+       [:span {:class "ml-auto px-2 py-0.5 text-xs font-medium rounded-full bg-red-500"}
+        badge-label])]))
 
-(defn accordion [{:keys [items class]}]
-  [:div {:class (str "space-y-2 " (or class ""))}
-   (for [[i item] (map-indexed vector items)]
-     (let [id (str "accordion-" i)]
-       [:div {:class "border border-gray-200 rounded-lg"}
-        [:button
-         {:class "w-full px-4 py-3 text-left flex justify-between items-center hover:bg-gray-50"
-          :_ (format "on click toggle .hidden on #%s-content"
-                     id)}
-         [:span {:class "font-medium text-gray-900"}
-          (:title item)]
-         [:span {:class "transform transition-transform"} "▾"]]
-        [:div {:id (str id "-content")
-               :class "hidden px-4 py-3 text-gray-600"}
-         (:content item)]]))])
+(defn accordion [{:as opts :keys [items]}]
+  (let [klass (:class opts)]
+    [:div {:class (str "space-y-2 " (or klass ""))}
+     (for [[i item] (map-indexed vector items)]
+       (let [id (str "accordion-" i)]
+         [:div {:class "border border-gray-200 rounded-lg"}
+          [:button
+           {:class "w-full px-4 py-3 text-left flex justify-between items-center hover:bg-gray-50"
+            :_ (format "on click toggle .hidden on #%s-content"
+                       id)}
+           [:span {:class "font-medium text-gray-900"}
+            (:title item)]
+           [:span {:class "transform transition-transform"} "▾"]]
+          [:div {:id (str id "-content")
+                 :class "hidden px-4 py-3 text-gray-600"}
+           (:content item)]]))]))
 
-(defn tree-view [{:keys [nodes class]}]
-  [:ul {:class (str "space-y-1 " (or class ""))}
-   (for [node nodes]
-     [:li
-      [:div.flex.items-center.py-1
-       (when (:children node)
-         [:button
-          {:class "w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600"
-           :_ "on click toggle .hidden on next .tree-children"}
-          "▸"])
-       [:span.text-gray-700 (:label node)]]
-      (when (:children node)
-        [:ul
-         {:class "tree-children hidden pl-5 border-l border-gray-200 ml-2"}
-         (for [child (:children node)]
-           [:li [:span.text-gray-600 (:label child)]])])])])
+(defn tree-view [{:as opts :keys [nodes]}]
+  (let [klass (:class opts)]
+    [:ul {:class (str "space-y-1 " (or klass ""))}
+     (for [node nodes]
+       [:li
+        [:div.flex.items-center.py-1
+         (when (:children node)
+           [:button
+            {:class "w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600"
+             :_ "on click toggle .hidden on next .tree-children"}
+            "▸"])
+         [:span.text-gray-700 (:label node)]]
+        (when (:children node)
+          [:ul
+           {:class "tree-children hidden pl-5 border-l border-gray-200 ml-2"}
+           (for [child (:children node)]
+             [:li [:span.text-gray-600 (:label child)]])])])]))
 
 (defn tabs-view
   [title tabs pages]
@@ -406,9 +426,10 @@
        (user-menu {:user user}))]]])
 
 (defn user-avatar
-  [{:keys [name src size class]
+  [{:as opts :keys [name src size]
     :or {size :md}}]
-  (let [size-c (case size
+  (let [klass (:class opts)
+        size-c (case size
                  :xs "w-6 h-6"
                  :sm "w-8 h-8"
                  :md "w-10 h-10"
@@ -417,56 +438,65 @@
     [:img {:src (or src "/static/img/avatar-default.svg")
            :alt name
            :class (str size-c " rounded-full object-cover "
-                       fallback-bg " " (or class ""))}]))
+                       fallback-bg " " (or klass ""))}]))
 
 (defn welcome-banner
-  [{:keys [title subtitle action action-text class]}]
-  [:div {:class
-         (str "bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 text-white "
-              (or class ""))}
-   [:div.flex.items-center.justify-between
-    [:div
-     [:h2 {:class "text-2xl font-bold mb-1"} title]
-     (when subtitle
-       [:p {:class "text-white/80"} subtitle])]
-    (when action
-      [:a {:href action
-           :class "px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-white/90 transition-colors"}
-       action-text])]])
+  [{:as opts :keys [title subtitle action action-text]}]
+  (let [klass (:class opts)]
+    [:div {:class
+           (str "bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 text-white "
+                (or klass ""))}
+     [:div.flex.items-center.justify-between
+      [:div
+       [:h2 {:class "text-2xl font-bold mb-1"} title]
+       (when subtitle
+         [:p {:class "text-white/80"} subtitle])]
+      (when action
+        [:a {:href action
+             :class "px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-white/90 transition-colors"}
+         action-text])]]))
 
 (defn activity-item
-  [{:keys [icon icon-bg title description time class]
-    :or {icon-bg "bg-gray-100"}}]
-  [:div {:class (str "flex items-start space-x-3 "
-                     (or class ""))}
-   [:div {:class (str "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 " icon-bg)}
-    icon]
-   [:div.flex-1.min-w-0
-    [:p.text-sm.text-gray-900 title]
-    (when description
-      [:p.text-xs.text-gray-500 description])
-    (when time
-      [:p.text-xs.text-gray-400.mt-1 time])]])
+  [{:as opts :keys [title description]}]
+  (let [klass (:class opts)
+        icon-val (:icon opts)
+        icon-bg (get opts :icon-bg "bg-gray-100")
+        time-val (:time opts)]
+    [:div {:class (str "flex items-start space-x-3 "
+                       (or klass ""))}
+     [:div {:class (str "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 " icon-bg)}
+      icon-val]
+     [:div.flex-1.min-w-0
+      [:p.text-sm.text-gray-900 title]
+      (when description
+        [:p.text-xs.text-gray-500 description])
+      (when time-val
+        [:p.text-xs.text-gray-400.mt-1 time-val])]]))
 
 (defn activity-feed
-  [{:keys [items class]}]
-  [:div {:class (str "divide-y divide-gray-100 "
-                     (or class ""))}
-   (for [item items]
-     (activity-item item))])
+  [{:as opts :keys [items]}]
+  (let [klass (:class opts)]
+    [:div {:class (str "divide-y divide-gray-100 "
+                       (or klass ""))}
+     (for [item items]
+       (activity-item item))]))
 
-(defn quick-action [{:keys [href icon label class]}]
-  [:a {:href (or href "#")
-       :class (str "flex flex-col items-center p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors "
-                   (or class ""))}
-   [:div {:class "w-12 h-12 rounded-full flex items-center justify-center mb-3 bg-blue-100"}
-    icon]
-   [:span.text-sm.font-medium.text-gray-900 label]])
+(defn quick-action [{:as opts :keys [href label]}]
+  (let [klass (:class opts)
+        icon-val (:icon opts)]
+    [:a {:href (or href "#")
+         :class (str "flex flex-col items-center p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors "
+                     (or klass ""))}
+     [:div {:class "w-12 h-12 rounded-full flex items-center justify-center mb-3 bg-blue-100"}
+      icon-val]
+     [:span.text-sm.font-medium.text-gray-900 label]]))
 
 (defn stats-icon
-  [{:keys [icon color class]
+  [{:as opts :keys [color]
     :or {color :blue}}]
-  (let [color-c
+  (let [klass (:class opts)
+        icon-val (:icon opts)
+        color-c
         (case color
           :blue "bg-blue-100 text-blue-600"
           :purple "bg-purple-100 text-purple-600"
@@ -477,48 +507,53 @@
     [:div
      {:class (str "w-12 h-12 rounded-xl flex items-center justify-center "
                   color-c " "
-                  (or class ""))}
-     [:span {:class "w-6 h-6"} icon]]))
+                  (or klass ""))}
+     [:span {:class "w-6 h-6"} icon-val]]))
 
 (defn dropdown-menu
-  [{:keys [items class]}]
-  [:div
-   {:class (str "absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 "
-                (or class ""))
-    :_ "on click outside remove me"}
-   (for [item items]
-     [:a {:href (:href item "#")
-          :class (str "block px-4 py-2 text-sm "
-                      (if (= (:variant item) :danger)
-                        "text-red-600" "text-gray-700")
-                      " hover:bg-gray-100")}
-      (:label item)])])
+  [{:as opts :keys [items]}]
+  (let [klass (:class opts)]
+    [:div
+     {:class (str "absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 "
+                  (or klass ""))
+      :_ "on click outside remove me"}
+     (for [item items]
+       [:a {:href (:href item "#")
+            :class (str "block px-4 py-2 text-sm "
+                        (if (= (:variant item) :danger)
+                          "text-red-600" "text-gray-700")
+                        " hover:bg-gray-100")}
+        (:label item)])]))
 
 (defn notification-badge
-  [{:keys [count class]}]
-  (when (pos? count)
-    [:span
-     {:class (str "absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs font-medium text-white bg-red-500 rounded-full "
-                  (or class ""))}
-     (if (> count 99) "99+" count)]))
+  [{:as opts}]
+  (let [cnt (:count opts)
+        klass (:class opts)]
+    (when (pos? cnt)
+      [:span
+       {:class (str "absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs font-medium text-white bg-red-500 rounded-full "
+                    (or klass ""))}
+       (if (> cnt 99) "99+" cnt)])))
 
 (defn page-title
-  [{:keys [title subtitle class]}]
-  [:div {:class (str "mb-6 " (or class ""))}
-   [:h1
-    {:class "text-2xl md:text-3xl font-bold text-gray-900"}
-    title]
-   (when subtitle
-     [:p {:class "mt-1 text-gray-500"} subtitle])])
+  [{:as opts :keys [title subtitle]}]
+  (let [klass (:class opts)]
+    [:div {:class (str "mb-6 " (or klass ""))}
+     [:h1
+      {:class "text-2xl md:text-3xl font-bold text-gray-900"}
+      title]
+     (when subtitle
+       [:p {:class "mt-1 text-gray-500"} subtitle])]))
 
 (defn search-bar
-  [{:keys [placeholder on-post target hx-indicator class], :or {placeholder "搜索..."}}]
-  (let [input-cls "w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+  [{:as opts :keys [placeholder on-post target hx-indicator], :or {placeholder "搜索..."}}]
+  (let [klass (:class opts)
+        input-cls "w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         wrapper-cls "relative hidden md:block"
         icon-cls "absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"]
     [:div {:class
            (str "flex items-center "
-                (or class ""))}
+                (or klass ""))}
      [:div {:class wrapper-cls}
       [:svg {:class icon-cls
              :fill "none"
@@ -545,9 +580,10 @@
                  :class input-cls}])]]))
 
 (defn data-table
-  [{:keys [columns rows actions empty-message class]
+  [{:as opts :keys [columns rows actions empty-message]
     :or {empty-message "暂无数据"}}]
-  (let [th-cls "px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+  (let [klass (:class opts)
+        th-cls "px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
         td-cls "px-4 py-3 text-sm text-gray-900"
         get-val
         (fn [row col]
@@ -572,7 +608,7 @@
                        (render-action-btn a))]])]))]
     [:div
      {:class (str "overflow-hidden rounded-lg shadow "
-                  (or class ""))}
+                  (or klass ""))}
      [:table {:class "min-w-full divide-y divide-gray-200"}
       [:thead {:class "bg-gray-50"}
        [:tr (for [col columns]

@@ -26,7 +26,7 @@
 
 (deftest wrap-session-create-test
   (testing "adds created-at to new session"
-    (let [handler (fn [req] {:status 200 :body "ok" :session (get-in req [:session])})
+    (let [handler (fn [req] {:status 200 :body "ok" :session (:session req)})
           wrapped (session/wrap-session-create handler)
           req {:session {:user-id 1}}
           resp (wrapped req)]
@@ -37,7 +37,7 @@
     (let [existing-ts (- (System/currentTimeMillis) 10000)
           handler (fn [req]
                     {:status 200 :body "ok"
-                     :session (get-in req [:session])})
+                     :session (:session req)})
           wrapped (session/wrap-session-create handler)
           req {:session {:user-id 1
                          :session/created-at existing-ts}}

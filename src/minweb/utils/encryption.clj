@@ -14,9 +14,9 @@
        (drop-while #(= % 0))
        byte-array))
 
-(defn md5 [str]
+(defn md5 [s]
   (bytes->hex (.digest (MessageDigest/getInstance "MD5")
-                       (.getBytes str "UTF-8"))))
+                       (.getBytes s "UTF-8"))))
 
 (defn hash-password
   ([password]

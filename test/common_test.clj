@@ -96,7 +96,7 @@
     (let [result (c/round-to 3.14159 2)]
       (is (> result 3.13))
       (is (< result 3.15)))
-    (is (= (c/round-to 3.001 1) 3.0))))
+    (is (= 3.0 (c/round-to 3.001 1)))))
 
 (deftest tm-now-test
   (testing "returns current timestamp"

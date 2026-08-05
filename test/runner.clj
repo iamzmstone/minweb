@@ -24,19 +24,21 @@
 (defn run-all-tests []
   (println "\n=== Running all tests ===\n")
   (let [totals (atom {:tests 0 :fail 0 :error 0})]
-    (doseq [ns test-names]
+    (doseq [ns-sym test-names]
       (try
-        (require ns)
+        (require ns-sym)
         (catch Exception _e
-          (println "Warning: Could not load" ns)))
+          (println "Warning: Could not load" ns-sym)))
       (try
-        (let [summary (t/run-tests ns)]
-          (when summary
-            (swap! totals update :tests + (:test summary 0))
-            (swap! totals update :fail + (:fail summary 0))
-            (swap! totals update :error + (:error summary 0))))
+        (let [summary (t/run-tests ns-sym)
+              pass-count (or (:test summary) 0)
+              fail-count (or (:fail summary) 0)
+              error-count (or (:error summary) 0)]
+          (swap! totals update :tests + pass-count)
+          (swap! totals update :fail + fail-count)
+          (swap! totals update :error + error-count))
         (catch Exception e
-          (println "Error running" ns ":" (.getMessage e)))))
+          (println "Error running" ns-sym ":" (.getMessage e)))))
     (println "\n=== Test Summary ===")
     (println "Total:" (:tests @totals) "tests")
     (println "Failures:" (:fail @totals))

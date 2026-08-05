@@ -54,8 +54,8 @@
 (defn rand-password
   "Generate a random 12-character password"
   []
-  (let [chars "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"]
-    (apply str (take 12 (repeatedly #(nth chars (rand-int (count chars))))))))
+  (let [alphabet "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"]
+    (apply str (take 12 (repeatedly #(nth alphabet (rand-int (count alphabet))))))))
 
 (defn valid-password?
   "Validate password complexity:
@@ -75,12 +75,12 @@
 
 (defn to-bj-time
   "opt can be {:format yyyy-MM-dd HH:mm:ss.SSSXXX}"
-  [utc-time-str & opt]
+  [utc-time-str & [opt]]
   (let [instant (Instant/parse utc-time-str)
         beijing-zone (ZoneId/of "Asia/Shanghai")
         beijing-time (ZonedDateTime/ofInstant instant beijing-zone)
-        {:keys [format] :or {format "yyyy-MM-dd HH:mm:ss"}} opt
-        formatter (DateTimeFormatter/ofPattern format)]
+        fmt (or (:format opt) "yyyy-MM-dd HH:mm:ss")
+        formatter (DateTimeFormatter/ofPattern fmt)]
     (.format formatter beijing-time)))
 
 (defn cnt-space

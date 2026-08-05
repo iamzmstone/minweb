@@ -19,14 +19,14 @@
    Options:
    - :size - :xs, :sm, :md, :lg (default :md)
    - :class - extra CSS classes"
-  [name & {:keys [size class] :or {size :md}}]
+  [name & {:keys [size] :or {size :md} :as opts}]
   (let [size-c (case size
                  :xs "w-4 h-4"
                  :sm "w-5 h-5"
                  :md "w-6 h-6"
                  :lg "w-8 h-8"
                  "w-6 h-6")]
-    [:svg {:class (merge-classes "text-current" size-c class)
+    [:svg {:class (merge-classes "text-current" size-c (:class opts))
            :fill "none"
            :stroke "currentColor"
            :viewBox "0 0 24 24"}
@@ -41,9 +41,9 @@
    Options:
    - :user - user map with :user/name and :user/avatar
    - :class - extra CSS classes"
-  [{:keys [user class]}]
+  [{:as opts :keys [user]}]
   [:div
-   {:class (merge-classes "flex items-center space-x-3" class)}
+   {:class (merge-classes "flex items-center space-x-3" (:class opts))}
    [:img
     {:src (or (:user/avatar user)
               "/static/img/avatar-default.svg")

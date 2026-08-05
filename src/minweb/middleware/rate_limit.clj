@@ -9,7 +9,7 @@
 (defn get-client-ip [req]
   (or (get-in req [:headers "x-forwarded-for"])
       (get-in req [:headers "x-real-ip"])
-      (get-in req [:remote-addr])
+      (:remote-addr req)
       "unknown"))
 
 (defn max-attempts []
@@ -27,23 +27,23 @@
 (defn is-locked? [ip now]
   (let [attempts @login-attempts
         entry (get attempts ip)
-        count (:count entry)
+        attempt-count (:count entry)
         ts (:ts entry)]
-    (when (and entry count ts)
+    (when (and entry attempt-count ts)
       (let [expiry (+ ts (* (lockout-minutes) 60 1000))]
-        (when (and (>= count (max-attempts)) (< now expiry))
+        (when (and (>= attempt-count (max-attempts)) (< now expiry))
           {:remaining-secs (quot (- expiry now) 1000)
-           :attempts count})))))
+           :attempts attempt-count})))))
 
 (defn record-failed [ip]
   (let [now (System/currentTimeMillis)
         attempts @login-attempts
         entry (get attempts ip)
-        count (if entry (:count entry) 0)
+        attempt-count (if entry (:count entry) 0)
         ts (if entry (:ts entry) now)]
-    (swap! login-attempts assoc ip {:count (inc count) :ts ts})
-    (when (>= (inc count) (max-attempts))
-      (log/warn "IP" ip "locked out due to" (inc count) "failed attempts"))))
+    (swap! login-attempts assoc ip {:count (inc attempt-count) :ts ts})
+    (when (>= (inc attempt-count) (max-attempts))
+      (log/warn "IP" ip "locked out due to" (inc attempt-count) "failed attempts"))))
 
 (defn record-success [ip]
   (swap! login-attempts update ip dissoc :count))

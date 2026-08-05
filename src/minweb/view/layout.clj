@@ -21,10 +21,10 @@
          a-cls "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
          ps (s/cur-page-size req)
          q (:query-params req)
-         next (when (not= current-page pages)
-                (str base-url "?"
-                     (r/query-params->url
-                      (merge q {"page" (+ current-page 1)}))))
+         next-url (when (not= current-page pages)
+                    (str base-url "?"
+                         (r/query-params->url
+                          (merge q {"page" (+ current-page 1)}))))
          previous (when (not= current-page 1)
                     (str base-url "?"
                          (r/query-params->url
@@ -56,9 +56,9 @@
       [:span.text-blue-500.px-2.py-2.border.border-gray-300.font-semibold
        (format "%d/%d" current-page pages)]
       [:a (merge {:class a-cls}
-                 (if (nil? next)
+                 (if (nil? next-url)
                    {:class "hidden"}
-                   {:href next}))
+                   {:href next-url}))
        [:span.sr-only "下一页"]
        [:svg.w-4.h-r {:viewBox "0 0 20 20" :fill "currentColor"
                       :aria-hidden "true"}

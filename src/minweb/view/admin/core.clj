@@ -24,22 +24,23 @@
     [(str v "管理") (str "/mgmt/" (name k))]))
 
 (def Menu
-  (html
-   [:nav
-    [:ul
-     (for [[name url icon] (map #(conj %1 %2) Menu-items Icons)]
-       [:li.mb-3.flex.items-center.gap-2
-        icon
+  (let [merged (map conj Menu-items Icons)]
+    (html
+     [:nav
+      [:ul
+       (for [[name url icon] merged]
+         [:li.mb-3.flex.items-center.gap-2
+          icon
+          [:a {:class "hover:text-gray-400"
+               :href url} name]])
+       [:li.mt-12.flex.items-center.gap-2
+        [:svg.h-6.w-6.text-white
+         {:xmlns "http://www.w3.org/2000/svg" :fill "none" :viewBox "0 0 24 24"
+          :stroke-width "1.5" :stroke "currentColor"}
+         [:path {:stroke-linecap "round" :stroke-linejoin "round"
+                 :d "M15.75 19.5 8.25 12l7.5-7.5"}]]
         [:a {:class "hover:text-gray-400"
-             :href url} name]])
-     [:li.mt-12.flex.items-center.gap-2
-      [:svg.h-6.w-6.text-white
-       {:xmlns "http://www.w3.org/2000/svg" :fill "none" :viewBox "0 0 24 24"
-        :stroke-width "1.5" :stroke "currentColor"}
-       [:path {:stroke-linecap "round" :stroke-linejoin "round"
-               :d "M15.75 19.5 8.25 12l7.5-7.5"}]]
-      [:a {:class "hover:text-gray-400"
-           :href "/"} "返回首页"]]]]))
+             :href "/"} "返回首页"]]]])))
 
 (def User-header
   ["Email" "姓名" "权限" "操作"])
@@ -171,11 +172,11 @@
            :hx-target "#div-modal"}
           "编辑"]
          [:button.text-white.px-2.py-1.rounded.ml-2
-          (let [{:keys [disabled? class confirm]} (del-style type (:db/id d))]
+          (let [{:keys [disabled? confirm] :as style} (del-style type (:db/id d))]
             {:hx-get (str "/delete-it/" (name type) "/" (:db/id d))
              :hx-confirm confirm
              :disabled disabled?
-             :class class
+             :class (:class style)
              :hx-target "closest tr"
              :hx-swap "outerHTML swap:1s"})
           "删除"]]])]]])
@@ -237,10 +238,10 @@
         [header keys]
         (case type
           :usr [User-header User-keys])
-        table (html (table-with-rownum type header keys data))]
+        table-html (html (table-with-rownum type header keys data))]
     (render {:title (str text "管理") :menu Menu
              :flash flash
-             :content (str div-filter table)
+             :content (str div-filter table-html)
              :company (env :company)})))
 
 (defn delete-it

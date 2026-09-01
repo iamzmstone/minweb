@@ -11,9 +11,14 @@
 (require '[pod.huahaiy.datalevin :as d])
 
 (def ^:dynamic *conn*
-  "Datalevin connection. Dynamic var — tests rebind with `binding`
-   for thread-local isolation; production code uses the root binding
-   initialized at namespace load."
+  "Single Datalevin connection per process — by design. LMDB rejects multiple
+   connections to the same path within one process ('multiple LMDB environment'
+   error). Reads via (d/db *conn*) return MVCC snapshots and are concurrent;
+   writes are serialized on the single writer lock. Use d/transact-async to
+   queue concurrent writes so the AsyncExecutor can batch them.
+
+   ^:dynamic is preserved for test rebinding (binding) — no test uses it
+   today, but the earmuffed name warrants the marker."
   (d/get-conn (env :dtlv-opts)
               (edn/read-string (slurp "schema.edn"))
               {:closed-schema? true
@@ -97,21 +102,23 @@
 
 (defn add-user
   [{:keys [email name password role privs]}]
-  (d/transact! *conn* [{:db/id -1
-                      :user/email email
-                      :user/name name
-                      :user/role (or role :normal)
-                      :user/privs
-                      (or privs [:project :search])
-                      :user/password
-                      (hash-password password)}]))
+  @(d/transact-async
+    *conn*
+    [{:db/id -1
+      :user/email email
+      :user/name name
+      :user/role (or role :normal)
+      :user/privs
+      (or privs [:project :search])
+      :user/password
+      (hash-password password)}]))
 
 (defn add-ents
   [ents]
   (let [attrs (keys (first ents))
         all-attrs (schema)]
     (if (every? #(contains? all-attrs %) attrs)
-      (d/transact! *conn* ents)
+      @(d/transact-async *conn* ents)
       (log/warn
        (str "There are attrs have not installed yet:"
             (difference (into #{} attrs) all-attrs))))))
@@ -119,12 +126,12 @@
 (defn del-ent-attr
   [eid attr]
   (when (pos-int? eid)
-    (d/transact! *conn* [[:db.fn/retractAttribute eid attr]])))
+    @(d/transact-async *conn* [[:db.fn/retractAttribute eid attr]])))
 
 (defn del-ent
   [eid]
   (when (pos-int? eid)
-    (d/transact! *conn* [[:db.fn/retractEntity eid]])))
+    @(d/transact-async *conn* [[:db.fn/retractEntity eid]])))
 
 (defn delete-by
   [criteria]
@@ -146,20 +153,21 @@
 (defn update-ent
   [eid attrs]
   (when (pos-int? eid)
-    (d/transact! *conn* (mapv #(merge {:db/id eid} %) attrs))))
+    @(d/transact-async *conn* (mapv #(merge {:db/id eid} %) attrs))))
 
 (defn update-ent-with-privs
   "Atomically retract all :user/privs values on eid, then assert new-privs
-   and update :user/name. Single d/transact! call = atomic. Use for cardinality-many
-   attribute replacement where partial-stale window is unacceptable."
+   and update :user/name. Single d/transact-async call = atomic. Use for
+   cardinality-many attribute replacement where partial-stale window is
+   unacceptable."
   [eid name new-privs]
   (when (pos-int? eid)
-    (d/transact!
-     *conn*
-     [[:db.fn/retractAttribute eid :user/privs]
-      {:db/id eid
-       :user/name name
-       :user/privs new-privs}])))
+    @(d/transact-async
+      *conn*
+      [[:db.fn/retractAttribute eid :user/privs]
+       {:db/id eid
+        :user/name name
+        :user/privs new-privs}])))
 
 (defn prj-devices
   [prj-eid]

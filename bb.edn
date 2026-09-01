@@ -15,7 +15,7 @@
   tailwindcss {:doc "Generate tailwindcss out file"
                :task (case os
                        "Linux" (shell "tailwindcss -i resources/tw_input.css -o resources/public/css/tw_out.css")
-                       "Mac OS X" (shell "npx @tailwindcss/cli -i resources/tw_input.css -o resources/public/css/tw_out.css")
+                       "Mac OS X" (shell "tailwindcss-macos-arm64 -i resources/tw_input.css -o resources/public/css/tw_out.css")
                        "Do nothing")}
   start-web {:doc "Start web application"
              :depends [tailwindcss]

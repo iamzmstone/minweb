@@ -17,6 +17,7 @@
    'view.components-test
    'view.render-integration-test
    'view.login-test
+   'database.user-test
    'integration.middleware-chain-test
    'integration.routes-test
    'integration.middleware-stack-test])
@@ -27,8 +28,8 @@
     (doseq [ns-sym test-names]
       (try
         (require ns-sym)
-        (catch Exception _e
-          (println "Warning: Could not load" ns-sym)))
+        (catch Exception e
+          (println "Warning: Could not load" ns-sym ":" (.getMessage e))))
       (try
         (let [summary (t/run-tests ns-sym)
               pass-count (or (:test summary) 0)

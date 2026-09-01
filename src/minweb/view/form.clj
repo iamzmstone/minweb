@@ -3,7 +3,8 @@
 (ns minweb.view.form
   (:require
    [minweb.view.config
-    :refer [input-size-classes merge-classes]]))
+    :refer [input-size-classes merge-classes]]
+   [minweb.middleware.security :as sec]))
 
 (defn form-input
   "Form input with consistent API.
@@ -90,8 +91,9 @@
       [:div.my-2
        (when label [:label {:for id-c :class label-c} label])
        [:input.form-control
-        {:type "file" :required required
-         :onchange (str "base64_upload('" id-c "', this)")}]
+        (merge {:type "file" :required required
+                :onchange (str "base64_upload('" id-c "', this)")}
+               (when sec/*csp-nonce* {:nonce sec/*csp-nonce*}))]
        [:input {:type "hidden" :name name :id id-c}]
        (when error [:span.text-sm.text-red-600.mt-1 error])]
 

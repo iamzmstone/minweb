@@ -171,15 +171,20 @@
                         (name type) "/" (:db/id d))
            :hx-target "#div-modal"}
           "编辑"]
-         [:button.text-white.px-2.py-1.rounded.ml-2
-          (let [{:keys [disabled? confirm] :as style} (del-style type (:db/id d))]
-            {:hx-get (str "/delete-it/" (name type) "/" (:db/id d))
-             :hx-confirm confirm
-             :disabled disabled?
-             :class (:class style)
-             :hx-target "closest tr"
-             :hx-swap "outerHTML swap:1s"})
-          "删除"]]])]]])
+         (let [{:keys [disabled? confirm] :as style} (del-style type (:db/id d))]
+           [:form {:method "post"
+                   :style "display:inline"
+                   :class "inline"
+                   :hx-post (str "/delete-it/" (name type) "/" (:db/id d))
+                   :hx-confirm confirm
+                   :hx-target "closest tr"
+                   :hx-swap "outerHTML swap:1s"}
+            (c/csrf-token)
+            [:button.text-white.px-2.py-1.rounded.ml-2
+             {:type "submit"
+              :disabled disabled?
+              :class (:class style)}
+             "删除"]])]])]]])
 
 (defn table-with-rownum
   [type cols keys data]
@@ -224,12 +229,13 @@
         (html
          [:div.flex.items-center.justify-between.mb-4
           [:input.px-4.py-2.rounded-md.border.border-gray-300.focus:border-blue-500.transition
-           {:type "text"
-            :class "w-1/3"
-            :placeholder "过滤..."
-            :_ "on input show <tbody>tr/> in <table/>
-                when its textContent.toLowerCase()
-                contains my value.toLowerCase()"}]
+           (merge {:type "text"
+                   :class "w-1/3"
+                   :placeholder "过滤..."
+                   :_ "on input show <tbody>tr/> in <table/>
+                       when its textContent.toLowerCase()
+                       contains my value.toLowerCase()"}
+                  (c/csp-nonce-attr))]
           [:button.bg-blue-500.text-white.px-4.py-2.rounded.mb-4
            {:hx-get (str "/show-modal/" (name type) "/-1")
             :hx-target "#div-modal"}

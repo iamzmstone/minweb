@@ -5,9 +5,10 @@
    [minweb.utils.response :as resp]))
 
 (defn chain-handler
-  "Creates a handler with security headers applied"
+  "Creates a handler with security headers applied (CSP + static headers)"
   [handler]
   (-> handler
+      security/wrap-csp
       security/wrap-security-headers))
 
 (deftest full-stack-security-headers-test

@@ -44,6 +44,7 @@
             #'ro/routes
             req-log/wrap-request-logging
             security/wrap-security-headers
+            security/wrap-csp
             (rate-limit/wrap-rate-limit ["/login" "/chpwd"])
             auth/wrap-auth
             (af/wrap-anti-forgery {:anti-forgery true

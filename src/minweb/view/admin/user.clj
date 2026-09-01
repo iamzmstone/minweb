@@ -38,24 +38,25 @@
              :id "modal-user"}
        [:div.bg-cyan-100.p-6.shadow-md.rounded-lg.w-full.max-w-md
         [:h2.text-xl.font-bold.mb-4 "编辑用户"]
-        [:form {:method "post"
-                :action "/add-usr"
-                :_ "on submit
-                     set email to (value of the #email)
-                     set name to (value of the #username)
-                     set privs to (value of the <input[name='privs']:checked/>)
-                     if no email or no name or no privs
-                       alert('请输入必填内容') then halt
-                     end
-                     set err_found to false
-                     for err in <p.err-msg/>
-                       if err.innerHTML.length > 0
-                         set err_found to true
-                       end
-                     end
-                     if err_found
-                       alert('请先修改错误') then halt
-                     end"}
+        [:form (merge {:method "post"
+                     :action "/add-usr"
+                     :_ "on submit
+                          set email to (value of the #email)
+                          set name to (value of the #username)
+                          set privs to (value of the <input[name='privs']:checked/>)
+                          if no email or no name or no privs
+                            alert('请输入必填内容') then halt
+                          end
+                          set err_found to false
+                          for err in <p.err-msg/>
+                            if err.innerHTML.length > 0
+                              set err_found to true
+                            end
+                          end
+                          if err_found
+                            alert('请先修改错误') then halt
+                          end"}
+                    (c/csp-nonce-attr))
          (c/csrf-token)
          [:input {:type "hidden"
                   :name "task"
@@ -105,8 +106,9 @@
                  k)}] t])]]
          [:div.flex.justify-end
           [:button.bg-gray-300.text-black.px-4.py-2.rounded.mr-2
-           {:type "button"
-            :_ "on click add .hidden to #modal-user"}
+           (merge {:type "button"
+                   :_ "on click add .hidden to #modal-user"}
+                  (c/csp-nonce-attr))
            "取消"]
           [:button.bg-blue-500.text-white.px-4.py-2.rounded
            {:type "submit"}

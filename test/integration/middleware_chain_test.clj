@@ -3,11 +3,16 @@
    [clojure.test :refer [deftest is testing]]
    [minweb.middleware.security :as security]))
 
+(defn chain [handler]
+  (-> handler
+      security/wrap-csp
+      security/wrap-security-headers))
+
 (deftest security-headers-test
   (testing "adds security headers to response"
     (let [handler (fn [_req]
                     {:status 200 :body "ok" :headers {}})
-          wrapped (security/wrap-security-headers handler)
+          wrapped (chain handler)
           resp (wrapped {})]
       (is (map? resp))
       (is (map? (:headers resp)))

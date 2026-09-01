@@ -37,7 +37,8 @@
        [:select (merge {:class sel-cls}
                        {:id "sel-ps"
                         :name "page-size"
-                        :onchange "this.form.submit()"})
+                        :onchange "this.form.submit()"}
+                       (c/csp-nonce-attr))
         (for [s sizes]
           [:option {:value s :selected (= ps s)}
            s])]]]
@@ -71,12 +72,13 @@
   (let [input-cls "bg-white rounded-l-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-500 transition text-black"
         btn-cls "bg-green-500 hover:bg-green-600 text-white p-2 rounded-t-md transition"]
     [:form
-     {:class "flex mt-4 lg:mt-0 lg:ml-4"
-      :_ "on submit
-            set q to (value of the #input-q)
-            if q.length is less than 2
-              alert('请输入至少2个字符') then halt
-            end"}
+     (merge {:class "flex mt-4 lg:mt-0 lg:ml-4"
+             :_ "on submit
+                   set q to (value of the #input-q)
+                   if q.length is less than 2
+                     alert('请输入至少2个字符') then halt
+                   end"}
+            (c/csp-nonce-attr))
      (c/csrf-token)
      [:input
       {:class input-cls :type "search" :name "q" :id "input-q" :required true}]
@@ -100,9 +102,10 @@
      [:div.max-w-7xl.mx-auto.flex.flex-wrap.items-center.justify-between.p-4
       [:a.text-2xl.font-bold {:href "/"} App-name]
       [:button
-       {:class "block lg:hidden" :id "menu-toggle"
-        :_ "on click
-               toggle .hidden on #navbar"}
+       (merge {:class "block lg:hidden" :id "menu-toggle"
+               :_ "on click
+                      toggle .hidden on #navbar"}
+              (c/csp-nonce-attr))
        [:svg.w-6.h-6
         {:fill "none" :stroke "currentColor"
          :viewBox "0 0 24 24"}
@@ -116,9 +119,13 @@
        [:ul {:class ul-cls}
         (for [m menu]
           [:li
-           [:a {:class a-cls
-                :href (first m)}
-            (last m)]])]
+           (if (= "/logout" (first m))
+             [:form {:method "post" :action "/logout" :class "inline"}
+              (c/csrf-token)
+              [:button {:class a-cls :type "submit"} (last m)]]
+             [:a {:class a-cls
+                  :href (first m)}
+              (last m)])])]
        (if form-search form-search "")]]]))
 
 (defn nav-view [req]

@@ -3,6 +3,7 @@
    [taoensso.timbre :as log]
    [minweb.utils.session :refer [current-user]]
    [ring.middleware.anti-forgery :as af]
+   [minweb.middleware.security :as sec]
    [minweb.view.config]
    [minweb.view.icons :as icons]
    [minweb.view.form]))
@@ -16,6 +17,13 @@
   [:input {:type "hidden"
            :name "__anti-forgery-token"
            :value af/*anti-forgery-token*}])
+
+(defn csp-nonce-attr
+  "Return {:nonce <value>} for the current request's CSP nonce, or {} when
+   no nonce is bound (e.g. in tests). Merge into the parent element map."
+  []
+  (when-let [n sec/*csp-nonce*]
+    {:nonce n}))
 
 ;; ========================================
 ;; Re-export from view.icons and view.config
@@ -82,13 +90,16 @@
                   "warning" "bg-yellow-500 text-white"
                   "danger" "bg-red-500 font-bold text-white"
                   "bg-blue-100 text-blue-800")]
-        [:div {:id "flashMessage"
-               :class (str cls " fixed top-20 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 flex items-center justify-between min-w-[250px] max-w-md")
-               :_ "on load wait 5s then add .opacity-0"}
+        [:div (merge {:id "flashMessage"
+                      :class (str cls " fixed top-20 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded shadow-lg transition-opacity duration-300 flex items-center justify-between min-w-[250px] max-w-md")
+                      :_ "on load wait 5s then add .opacity-0"}
+                     (csp-nonce-attr))
          [:span text]
          [:button
-          {:_ "on click add .opacity-0 to #flashMessage"
-           :class "ml-4 text-white font-bold"} "x"]]))))
+          (merge {:_ "on click add .opacity-0 to #flashMessage"
+                  :class "ml-4 text-white font-bold"}
+                 (csp-nonce-attr))
+          "x"]]))))
 
 ;; ========================================
 ;; Re-export from view.form
@@ -338,8 +349,9 @@
         [:div.flex.items-center.py-1
          (when (:children node)
            [:button
-            {:class "w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600"
-             :_ "on click toggle .hidden on next .tree-children"}
+            (merge {:class "w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                    :_ "on click toggle .hidden on next .tree-children"}
+                   (csp-nonce-attr))
             "▸"])
          [:span.text-gray-700 (:label node)]]
         (when (:children node)
@@ -514,9 +526,10 @@
   [{:as opts :keys [items]}]
   (let [klass (:class opts)]
     [:div
-     {:class (str "absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 "
-                  (or klass ""))
-      :_ "on click outside remove me"}
+     (merge {:class (str "absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 "
+                         (or klass ""))
+             :_ "on click outside remove me"}
+            (csp-nonce-attr))
      (for [item items]
        [:a {:href (:href item "#")
             :class (str "block px-4 py-2 text-sm "

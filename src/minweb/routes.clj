@@ -8,6 +8,7 @@
    [minweb.view.admin.core :as admin]
    [minweb.view.admin.user :as usradmin]
    [minweb.view.dashboard :as dashboard]
+   [minweb.view.layout :as layout]
    [minweb.view.login :as login]
    [minweb.view.resource :as resource]))
 
@@ -75,4 +76,6 @@
      (http-get "/resources" resource/page)
      (http-get "/sample" sample/example-page)
      (http-get "/health" health/health-page)
+     (http-post "/change-page-size" layout/change-page-size)
+     (http-post "/search" layout/search)
      (http-all "**" (fn [_] nil))] %))

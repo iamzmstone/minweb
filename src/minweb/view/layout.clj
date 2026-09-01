@@ -15,6 +15,25 @@
    ["/logout" "登出"]
    ["/about" "关于"]])
 
+(defn change-page-size
+  "Persist paginator page-size selection into session and bounce back to referer."
+  [req]
+  (let [size (parse-long (get-in req [:params "page-size"]))
+        from (or (get-in req [:headers "referer"]) "/")
+        new-session (assoc (:session req) :page-size size)]
+    {:status 302
+     :headers {"Location" from}
+     :session new-session}))
+
+(defn search
+  "Stub search endpoint — echoes the query back so the form doesn't 404.
+   Replace with real impl when search backend exists."
+  [req]
+  (let [q (get-in req [:params "q"])]
+    [:div.p-4
+     [:p "Search not implemented yet."]
+     [:p (str "Query: " q)]]))
+
 (defn paginator [req current-page pages base-url]
   (let* [sizes [20 40 60 80]
          sel-cls "mx-1 border rounded w-16 text-center text-gray-700 focus:ring-blue-500 focus:border-blue-500"

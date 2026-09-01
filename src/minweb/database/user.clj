@@ -53,11 +53,26 @@
       false)))
 
 (defn default-user
-  []
-  (let [email (or (:init-email env) "admin@example.com")
+  "Idempotent admin seeding.
+   No args: throw if user with :init-email already exists.
+   With `force` arg (any of `:force`, `\"force\"`, or `\":force\"`):
+   delete existing then re-create.
+   Prints new password to log on success."
+  [& args]
+  (let [force? (boolean (some #(contains? #{"force" ":force" :force} (str %)) args))
+        email (or (:init-email env) "admin@example.com")
         name (or (:init-name env) "Admin")
         role (or (:init-role env) :admin)
-        password (rand-password)]
+        password (rand-password)
+        existing (the-user email)]
+    (cond
+      (and existing force?)
+      (do (log/info "Force: deleting existing user:" email)
+          (db/del-ent (:db/id existing)))
+      existing
+      (throw (ex-info (str "User " email " already exists. Run `bb db-seed :force` to reset.")
+                      {:email email
+                       :existing-id (:db/id existing)})))
     (db/add-user {:email email
                   :name name
                   :password password

@@ -3,7 +3,15 @@
    [clojure.test :refer [deftest is testing]]
    [clojure.string :as str]
    [minweb.middleware.error :as error]
-   [minweb.view.layout :refer [error-page]]))
+   [minweb.view.layout :refer [error-page]]
+   [taoensso.timbre :as log]))
+
+(defmacro ^:private quietly
+  "Suppress timbre output — the handler is *supposed* to log the exception we
+   throw on purpose, and its stacktrace otherwise buries the test summary."
+  [& body]
+  `(binding [log/*config* (assoc log/*config* :min-level :fatal)]
+     ~@body))
 
 (deftest error-page-test
   (testing "error-page generates HTML with status and message"
@@ -45,7 +53,7 @@
   (testing "catches exception and returns 500 page"
     (let [handler (fn [_] (throw (ex-info "test" {})))
           wrapped (error/wrap-error-handler handler)
-          resp (wrapped {})]
+          resp (quietly (wrapped {}))]
       (is (= 500 (:status resp)))
       (is (str/includes? (:body resp) "500"))))
 

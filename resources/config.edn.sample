@@ -8,4 +8,8 @@
  :init-pwd "change-me-after-first-login"
  :company "Min's Web"
  :rate-limit-max-attempts 5
- :rate-limit-lockout-minutes 15}
+ :rate-limit-lockout-minutes 15
+ ;; Only enable behind a reverse proxy you control. When true, X-Forwarded-For
+ ;; / X-Real-IP are trusted for rate-limit keying; any client can forge them,
+ ;; so leaving it false keys the limiter on the real socket address.
+ :trust-proxy-headers false}

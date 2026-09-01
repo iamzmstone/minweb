@@ -48,9 +48,18 @@
 
 (defn correct-password? [email password]
   (let [user (the-user email)]
-    (if user
-      (enc/password= (:user/password user) password)
-      false)))
+    (when user
+      (let [stored (:user/password user)]
+        (when (enc/password= stored password)
+          ;; Successful auth — silently upgrade legacy hash on first login.
+          (when (enc/legacy-hash? stored)
+            (try
+              (db/update-ent (:db/id user)
+                             [{:user/password (enc/hash-password password)}])
+              (log/info "Upgraded password hash to PBKDF2 600k for user:" email)
+              (catch Exception e
+                (log/warn "Hash upgrade failed for" email ":" (.getMessage e)))))
+          true)))))
 
 (defn default-user
   "Idempotent admin seeding.

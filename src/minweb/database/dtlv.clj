@@ -148,6 +148,19 @@
   (when (pos-int? eid)
     (d/transact! *conn* (mapv #(merge {:db/id eid} %) attrs))))
 
+(defn update-ent-with-privs
+  "Atomically retract all :user/privs values on eid, then assert new-privs
+   and update :user/name. Single d/transact! call = atomic. Use for cardinality-many
+   attribute replacement where partial-stale window is unacceptable."
+  [eid name new-privs]
+  (when (pos-int? eid)
+    (d/transact!
+     *conn*
+     [[:db.fn/retractAttribute eid :user/privs]
+      {:db/id eid
+       :user/name name
+       :user/privs new-privs}])))
+
 (defn prj-devices
   [prj-eid]
   (let [q '[:find

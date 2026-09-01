@@ -7,7 +7,7 @@
    [minweb.view.core :as c]
    [minweb.view.layout :as l]
    [minweb.database.user
-    :refer [correct-password? the-user passwd-ok? add]]
+    :refer [correct-password? the-user passwd-ok? change-password]]
    [minweb.middleware.rate-limit :refer [get-client-ip record-failed record-success]]))
 
 (defn logout [req]
@@ -89,11 +89,7 @@
     (if (passwd-ok? (:user/password user) opw)
       (if (validate-passwd npw npwc)
         (do
-          (add {:email (:user/email user)
-                :name (:user/name user)
-                :role (:user/role user)
-                :privs (:user/privs user)
-                :password npw})
+          (change-password (:db/id user) npw)
           (c/log-user req "change password successfully")
           (r/flash-msg
            (r/redirect "/")

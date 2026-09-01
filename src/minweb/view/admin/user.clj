@@ -5,7 +5,6 @@
    [minweb.utils.response :as r]
    [minweb.common :refer [env to-coll]]
    [minweb.view.core :as c :refer [log-user]]
-   [minweb.database.dtlv :as dtlv]
    [minweb.database.user :as user]))
 
 (def Privs
@@ -144,13 +143,13 @@
          (r/redirect "/mgmt/usr")
          "danger" (str err-msg ",用户保存失败.")))
       (do
-        (when (pos-int? uid) ;; delete many attribute privileges for the user
-          (dtlv/del-ent-attr uid :user/privs))
-        (user/add {:email email
-                   :name name
-                   :password (env :init-pwd)
-                   :role nil
-                   :privs privs})
+        (case task
+          "add"    (user/add {:email email
+                              :name name
+                              :password (env :init-pwd)
+                              :role nil
+                              :privs privs})
+          "modify" (user/update-user uid {:name name :privs privs}))
         (log-user req
                   (str task " user:" email " successfully."))
         (r/flash-msg

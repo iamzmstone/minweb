@@ -27,6 +27,21 @@
   [user]
   (db/add-user user))
 
+(defn change-password
+  "Hash new-password and update :user/password on the existing entity.
+   Use instead of (add ...) — add creates a new tempid, never updates."
+  [eid new-password]
+  (when (pos-int? eid)
+    (db/update-ent eid [{:user/password (enc/hash-password new-password)}])))
+
+(defn update-user
+  "In-place update of an existing user. Replaces :user/privs atomically
+   (retract all + assert new) and updates :user/name. :user/email is NOT
+   touched (unique-identity, read-only in UI)."
+  [eid {:keys [name privs]}]
+  (when (pos-int? eid)
+    (db/update-ent-with-privs eid name (or privs []))))
+
 (defn passwd-ok?
   [enc-pw pw]
   (enc/password= enc-pw pw))

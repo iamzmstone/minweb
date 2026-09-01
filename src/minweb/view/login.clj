@@ -26,12 +26,14 @@
          email passwd)
       (do
         (record-success ip)
-        (let [user (the-user email)]
+        (let [user (the-user email)
+              new-session (-> {:user-id (:db/id user)}
+                              (vary-meta assoc :recreate true))]
           (log/info "User" (:user/name user) "logined in")
           (assoc (r/flash-msg
                   (r/redirect url)
                   "success" (str (:user/name user) ", 登陆系统成功"))
-                 :session {:user-id (:db/id user)})))
+                 :session new-session)))
       (do
         (record-failed ip)
         (log/warn "Login failed for" email)

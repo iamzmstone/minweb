@@ -13,6 +13,7 @@
    [minweb.middleware.security :as security]
    [minweb.middleware.session :as session-mw]
    [minweb.middleware.error :as error]
+   [minweb.common :refer [env]]
    [taoensso.timbre :as log]
    [taoensso.timbre.appenders.core :as appenders]
    [org.httpkit.server :as srv]))
@@ -50,7 +51,10 @@
             (af/wrap-anti-forgery {:anti-forgery true
                                    :token-expiry (* 60 60 24)})
             f/wrap-flash
-            s/wrap-session
+            (s/wrap-session
+             {:cookie-attrs {:http-only true
+                             :same-site :lax
+                             :secure (boolean (env :cookie-secure?))}})
             session-mw/wrap-session-create
             session-mw/wrap-session-timeout
             mp/wrap-multipart-params

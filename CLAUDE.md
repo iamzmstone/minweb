@@ -49,7 +49,7 @@ Middleware chain (in core.clj):
 - `src/minweb/middleware/session.clj` - Session timeout handling (default 30 min)
 - `src/minweb/middleware/error.clj` - Error handling (404/500 pages)
 - `src/minweb/database/migration.clj` - Schema version management and migrations
-- `src/minweb/view/health.clj` - Health check endpoint (/health)
+- `src/minweb/view/health.clj` - Health check endpoint (/health) — probes the DB; 200 `ok` / 503 `degraded`
 - `src/minweb/view/core.clj` - Reusable UI components (badge, card, stat-card, etc.), re-exports from view.config, view.icons, and view.form
 - `src/minweb/view/config.clj` - Component configuration maps (badge-variant-classes, badge-size-classes, input-size-classes, merge-classes)
 - `src/minweb/view/icons.clj` - SVG icon components (icon-paths, icon, user-menu)

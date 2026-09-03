@@ -39,6 +39,15 @@
   []
   (into #{:db/id} (keys (d/schema *conn*))))
 
+(defn ping
+  "Cheapest possible real read against the live conn — proves the LMDB env is
+   open and queryable. Throws if the connection is dead. Return value is
+   meaningless (nil on an empty DB); callers should only care about throw/no-throw."
+  []
+  (ffirst (d/q '[:find (count ?e)
+                 :where [?e :user/email]]
+               (d/db *conn*))))
+
 (defn the-ent
   [eid]
   (when (pos-int? eid)

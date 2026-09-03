@@ -17,6 +17,7 @@
    'view.components-test
    'view.render-integration-test
    'view.login-test
+   'view.health-test
    'database.user-test
    'integration.middleware-chain-test
    'integration.routes-test

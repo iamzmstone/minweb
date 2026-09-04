@@ -7,6 +7,9 @@
    'routes-test
    'utils.response-test
    'utils.encryption-test
+   'utils.oss-aliyun-test
+   'utils.oss-ctyun-test
+   'utils.oss-sniff-test
    'middleware.auth-test
    'middleware.rate-limit-test
    'middleware.error-test

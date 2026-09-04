@@ -55,6 +55,9 @@ Middleware chain (in core.clj):
 - `src/minweb/view/icons.clj` - SVG icon components (icon-paths, icon, user-menu)
 - `src/minweb/view/form.clj` - Form components (form-input, form-select, form-checkbox, form-radio, form-toggle, form-submit-btn)
 - `src/minweb/view/layout.clj` - Base HTML layout with navbar, pagination, dashboard
+- `src/minweb/utils/oss_aliyun.clj` - 阿里云 OSS provider(自实现 HmacSHA1 签名,无 SDK 依赖;put-object / get-object)
+- `src/minweb/utils/oss_ctyun.clj` - 天翼云 ZOS provider(AWS SigV4 + path-style URL;put-object / get-object / put-bucket-policy!)
+- `src/minweb/utils/oss_sniff.clj` - 图片 magic byte 嗅探(JPEG/PNG/GIF/WebP,跨三方「multipart 撒谎」 bug 用)
 
 ### Database Schema
 Defined in `schema.edn` using Datalevin's schema format. Current entities:

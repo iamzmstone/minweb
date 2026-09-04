@@ -30,7 +30,10 @@ minweb/
   │   ├── utils/
   │   │   ├── encryption.clj    # Password hashing
   │   │   ├── response.clj      # Response helpers
-  │   │   └── session.clj       # Session management
+  │   │   ├── session.clj       # Session management
+  │   │   ├── oss_aliyun.clj    # 阿里云 OSS provider(自实现签名,无 SDK 依赖)
+  │   │   ├── oss_ctyun.clj     # 天翼云 ZOS provider(AWS SigV4 + path-style)
+  │   │   └── oss_sniff.clj     # 图片 magic byte 嗅探(JPEG/PNG/GIF/WebP)
   │   └── view/
   │       ├── core.clj          # Reusable UI components (badge, card, form-input, etc.)
   │       └── layout.clj        # Base layout, navbar, pagination, dashboard

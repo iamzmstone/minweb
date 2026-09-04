@@ -179,6 +179,15 @@
        :user/name name
        :user/privs new-privs}])))
 
+(defn transact-many!
+  "Atomically apply a seq of datoms (entity add maps and
+   [:db.fn/retractEntity eid] retractions). Single d/transact! call =
+   atomic — observers never see an intermediate state. Caller is
+   responsible for [:db/id -1 ...] entity form on adds."
+  [datoms]
+  (when (seq datoms)
+    (d/transact! *conn* datoms)))
+
 (defn prj-devices
   [prj-eid]
   (let [q '[:find
